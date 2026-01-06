@@ -35,6 +35,9 @@ ol { text-align:left; }
 <div class="box" id="quiz" style="display:none;">
   <h3 id="question"></h3>
   <div id="answers"></div>
+  <div class="progressbar"><span id="timebar"></span></div>
+  <p id="progress"></p>
+</div>
   <p id="progress"></p>
 </div>
 <div class="box" id="result" style="display:none;">
@@ -59,20 +62,120 @@ let user = "";
 let quiz = [];
 let current = 0;
 let score = 0;
+// 🔥 RIKTIGA FRÅGOR (20 per quiz – svåra men rimliga 13–20 år)
 const quizzes = {
-  pl: Array.from({length:20},(_,i)=>({q:`Premier League-fråga ${i+1}`,a:["Alternativ A","Alternativ B","Alternativ C"],c:Math.floor(Math.random()*3)})),
-  vm: Array.from({length:20},(_,i)=>({q:`VM-fråga ${i+1}`,a:["Alternativ A","Alternativ B","Alternativ C"],c:Math.floor(Math.random()*3)})),
-  all: Array.from({length:20},(_,i)=>({q:`Allsvenskan-fråga ${i+1}`,a:["Alternativ A","Alternativ B","Alternativ C"],c:Math.floor(Math.random()*3)}))
+  pl: [
+    {q:"Vilken klubb vann Premier League säsongen 2015/16?",a:["Chelsea","Leicester City","Arsenal"],c:1},
+    {q:"Vilken spelare har gjort flest mål i Premier League genom tiderna?",a:["Wayne Rooney","Alan Shearer","Sergio Agüero"],c:1},
+    {q:"Vilken manager tog Liverpool till ligatitel 2020?",a:["Jürgen Klopp","Rafael Benítez","Brendan Rodgers"],c:0},
+    {q:"Vilken klubb spelar sina hemmamatcher på Etihad Stadium?",a:["Manchester United","Manchester City","Everton"],c:1},
+    {q:"Vilken klubb har smeknamnet 'The Gunners'?",a:["Arsenal","Tottenham","Chelsea"],c:0},
+    {q:"Vilket lag har vunnit Premier League flest gånger?",a:["Liverpool","Manchester United","Chelsea"],c:1},
+    {q:"Vilken spelare gjorde 32 mål säsongen 2017/18?",a:["Harry Kane","Mohamed Salah","Kevin De Bruyne"],c:1},
+    {q:"Vilken klubb kallas 'The Toffees'?",a:["Everton","Leeds","West Ham"],c:0},
+    {q:"Vilken tränare har vunnit Premier League flest gånger?",a:["Pep Guardiola","Alex Ferguson","José Mourinho"],c:1},
+    {q:"Vilket år startade Premier League?",a:["1990","1992","1995"],c:1},
+    {q:"Vilken spelare har flest assist genom tiderna i PL?",a:["Ryan Giggs","Cesc Fàbregas","Kevin De Bruyne"],c:0},
+    {q:"Vilken klubb har hemmaarena Anfield?",a:["Liverpool","Aston Villa","Newcastle"],c:0},
+    {q:"Vilken spelare kallas 'The Egyptian King'?",a:["Mané","Salah","Mahrez"],c:1},
+    {q:"Vilken klubb vann Premier League 2022/23?",a:["Arsenal","Manchester City","Liverpool"],c:1},
+    {q:"Vilket lag åkte ur PL 2020/21 med 13 poäng?",a:["Derby","Sheffield United","Norwich"],c:1},
+    {q:"Vilken spelare gjorde flest mål för Tottenham i PL?",a:["Harry Kane","Son","Bale"],c:0},
+    {q:"Vilken klubb kallas 'The Blues'?",a:["Chelsea","Everton","Leicester"],c:0},
+    {q:"Vilken tränare leder Manchester City?",a:["Guardiola","Arteta","Ten Hag"],c:0},
+    {q:"Vilken arena är störst i PL?",a:["Old Trafford","Emirates","Tottenham Stadium"],c:0},
+    {q:"Vilken klubb vann PL utan en enda bortaförlust 2003/04?",a:["Chelsea","Arsenal","Man United"],c:1}
+  ],
+  vm: [
+    {q:"Vilket land vann VM 2018?",a:["Brasilien","Frankrike","Tyskland"],c:1},
+    {q:"Vem gjorde flest mål i VM 2002?",a:["Ronaldo","Klose","Ronaldinho"],c:0},
+    {q:"Vilket land arrangerade VM 2014?",a:["Sydafrika","Brasilien","Ryssland"],c:1},
+    {q:"Vilket land har flest VM-guld?",a:["Tyskland","Brasilien","Italien"],c:1},
+    {q:"Vilken spelare vann Guldbollen VM 2014?",a:["Messi","Neymar","Kroos"],c:0},
+    {q:"Vilket år vann Sverige VM-silver?",a:["1958","1954","1962"],c:0},
+    {q:"Vem gjorde 'Guds hand'-målet?",a:["Pelé","Maradona","Zidane"],c:1},
+    {q:"Vilket land vann VM 2006?",a:["Frankrike","Italien","Brasilien"],c:1},
+    {q:"Vilken spelare har flest VM-mål totalt?",a:["Ronaldo","Klose","Messi"],c:1},
+    {q:"Vilket land arrangerade första VM 1930?",a:["Uruguay","Italien","Frankrike"],c:0},
+    {q:"Vilket lag slog Sverige i VM 2018 kvartsfinal?",a:["England","Frankrike","Belgien"],c:0},
+    {q:"Vilket land vann VM 2022?",a:["Frankrike","Argentina","Kroatien"],c:1},
+    {q:"Vilken svensk gjorde mål i VM 1994-semifinalen?",a:["Brolin","Larsson","Dahlin"],c:0},
+    {q:"Vilket land förlorade VM-finalen 1958?",a:["Sverige","Brasilien","Frankrike"],c:0},
+    {q:"Vilket land har spelat flest VM-finaler?",a:["Brasilien","Tyskland","Italien"],c:1},
+    {q:"Vilken spelare gjorde finalmålet VM 2010?",a:["Iniesta","Villa","Xavi"],c:0},
+    {q:"Vilket land vann VM 1998?",a:["Brasilien","Frankrike","Argentina"],c:1},
+    {q:"Vilket land arrangerade VM 2002?",a:["Japan & Korea","USA","Tyskland"],c:0},
+    {q:"Vilken spelare gjorde flest mål VM 2014?",a:["Messi","James Rodríguez","Müller"],c:1},
+    {q:"Vilket land vann VM 1954?",a:["Ungern","Tyskland","Brasilien"],c:1}
+  ],
+  all: [
+    {q:"Vilket lag har flest SM-guld?",a:["IFK Göteborg","Malmö FF","AIK"],c:0},
+    {q:"Vilket år startade Allsvenskan?",a:["1924","1910","1935"],c:0},
+    {q:"Vilket lag vann Allsvenskan 2023?",a:["Malmö FF","Elfsborg","Häcken"],c:1},
+    {q:"Vilken arena är störst i Allsvenskan?",a:["Friends Arena","Ullevi","Tele2 Arena"],c:0},
+    {q:"Vilket lag kallas 'Blåvitt'?",a:["IFK Göteborg","IFK Norrköping","Halmstad"],c:0},
+    {q:"Vilken klubb spelar på Tele2 Arena?",a:["AIK","Djurgården","Hammarby"],c:1},
+    {q:"Vilket lag vann Allsvenskan 2022?",a:["Häcken","AIK","Malmö FF"],c:0},
+    {q:"Vilket lag har flest derbyn i Stockholm?",a:["AIK","Djurgården","Hammarby"],c:0},
+    {q:"Vilket lag vann Allsvenskan 2020?",a:["Malmö FF","Djurgården","Elfsborg"],c:0},
+    {q:"Vilken färg har IFK Norrköping?",a:["Blå-vit","Röd-vit","Grön-vit"],c:0},
+    {q:"Vilken klubb vann SM-guld 2019?",a:["Djurgården","Malmö FF","AIK"],c:0},
+    {q:"Vilket lag har smeknamnet 'Gnaget'?",a:["AIK","Hammarby","Djurgården"],c:0},
+    {q:"Vilket lag spelar på Borås Arena?",a:["Elfsborg","Häcken","Kalmar"],c:0},
+    {q:"Vilket lag vann Allsvenskan 2018?",a:["AIK","Häcken","Malmö FF"],c:0},
+    {q:"Vilket lag har hemmaarena Strandvallen?",a:["Mjällby","Kalmar","Varberg"],c:0},
+    {q:"Vilket lag vann Allsvenskan 2021?",a:["Malmö FF","Djurgården","AIK"],c:1},
+    {q:"Vilken klubb har flest raka SM-guld?",a:["IFK Göteborg","Malmö FF","AIK"],c:0},
+    {q:"Vilket lag spelar på PlatinumCars Arena?",a:["Norrköping","Helsingborg","Sirius"],c:0},
+    {q:"Vilket lag vann Allsvenskan 2017?",a:["Malmö FF","AIK","Östersund"],c:1},
+    {q:"Vilket lag kallas 'Di blåe'?",a:["IFK Göteborg","Elfsborg","Malmö FF"],c:0}
+  ]
 };
 function enterMenu(){ user=document.getElementById('username').value.trim(); if(!user) return alert('Skriv namn'); document.getElementById('login').style.display='none'; document.getElementById('menu').style.display='block'; }
-function startQuiz(type){ quiz=quizzes[type]; current=0; score=0; document.getElementById('menu').style.display='none'; document.getElementById('quiz').style.display='block'; showQuestion(); }
+function startQuiz(type){
+  quiz = [...quizzes[type]];
+  // 🔀 Slumpa frågornas ordning (Fisher-Yates)
+  for(let i=quiz.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [quiz[i],quiz[j]]=[quiz[j],quiz[i]];
+  }
+  current=0; score=0;
+  document.getElementById('menu').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  showQuestion();
+}
+let timerInterval; let timeLeft=10;
 let timerInterval; let timeLeft=10;
 function showQuestion(){
   clearInterval(timerInterval);
   timeLeft=10;
+
+  // 🎨 Automatisk bakgrund per quiztyp (neutrala stadionbilder)
+  const backgrounds={
+    pl:"https://images.unsplash.com/photo-1505842465776-3a8f8f85bfe4",
+    vm:"https://images.unsplash.com/photo-1518091043644-c1d4457512c6",
+    all:"https://images.unsplash.com/photo-1603808033192-082d6919d3e1"
+  };
+  document.getElementById('quiz').style.backgroundImage=`linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url(${backgrounds[currentQuizType]})`;
+  document.getElementById('quiz').style.backgroundSize='cover';
+  document.getElementById('quiz').style.backgroundPosition='center';
+
   let q=quiz[current];
   document.getElementById('question').innerText=q.q;
   document.getElementById('progress').innerText=`Fråga ${current+1} av 20 ⏱️ ${timeLeft}s`;
+  let bar=document.getElementById('timebar'); bar.style.width='100%'; bar.parentElement.classList.remove('timer-low');
+
+  let a=document.getElementById('answers'); a.innerHTML="";
+  q.a.forEach((ans,i)=>{ let b=document.createElement('button'); b.innerText=ans; b.onclick=()=>checkAnswer(i); a.appendChild(b); });
+
+  timerInterval=setInterval(()=>{
+    timeLeft--;
+    bar.style.width=`${(timeLeft/10)*100}%`;
+    document.getElementById('progress').innerText=`Fråga ${current+1} av 20 ⏱️ ${timeLeft}s`;
+    if(timeLeft<=3) bar.parentElement.classList.add('timer-low');
+    if(timeLeft<=0){ clearInterval(timerInterval); current++; current<20?showQuestion():finishQuiz(); }
+  },1000);
+} av 20 ⏱️ ${timeLeft}s`;
   let a=document.getElementById('answers'); a.innerHTML="";
   q.a.forEach((ans,i)=>{ let b=document.createElement('button'); b.innerText=ans; b.onclick=()=>checkAnswer(i); a.appendChild(b); });
   timerInterval=setInterval(()=>{
