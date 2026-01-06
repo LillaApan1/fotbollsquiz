@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Globalt Fotbollsquiz</title>
 <style>
-body { font-family: Arial, sans-serif; background:#0b6623; color:white; margin:0; padding:10px; text-align:center; }
-.box { background:#1e8f4f; max-width:500px; margin:20px auto; padding:20px; border-radius:12px; }
-button { width:100%; padding:12px; margin:8px 0; border:none; border-radius:8px; font-size:16px; cursor:pointer; }
-input { width:90%; padding:10px; font-size:16px; border-radius:6px; border:none; }
-ol { text-align:left; }
+body { font-family: Arial,sans-serif; background:#0b6623; color:white; margin:0; padding:10px; text-align:center;}
+.box { background:#1e8f4f; max-width:500px; margin:20px auto; padding:20px; border-radius:12px;}
+button { width:100%; padding:12px; margin:8px 0; border:none; border-radius:8px; font-size:16px; cursor:pointer;}
+input { width:90%; padding:10px; font-size:16px; border-radius:6px; border:none;}
+ol { text-align:left;}
 </style>
 </head>
 <body>
@@ -48,34 +48,35 @@ ol { text-align:left; }
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-// 🔥 KListra in DIN Firebase-config här
-const firebaseConfig = {
-  apiKey: "DIN_API_KEY",
-  authDomain: "DIN_APP.firebaseapp.com",
-  projectId: "DITT_PROJECT_ID",
-};
+  // 🔥 KListra in din Firebase-config här
+  const firebaseConfig = {
+    apiKey: "DIN_API_KEY",
+    authDomain: "DIN_APP.firebaseapp.com",
+    projectId: "DITT_PROJECT_ID",
+  };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  console.log("Firebase init:", db);
 
 let user = "";
 let quiz = [];
 let current = 0;
 let score = 0;
 
+// Exempel med 2 frågor per quiz. Fyll på till 20 senare
 const quizzes = {
   pl: [
-    {q:"Vilken tränare vann Premier League 2015/16?",a:["Guardiola","Klopp","Ranieri"],c:2},
-    {q:"Vilket lag har flest PL-titlar?",a:["Man United","Chelsea","Liverpool"],c:0},
-    // (lägg till upp till 20)
+    {q:"Vilken tränare vann Premier League 2015/16?", a:["Guardiola","Klopp","Ranieri"], c:2},
+    {q:"Vilket lag har flest Premier League-titlar?", a:["Man United","Chelsea","Liverpool"], c:0}
   ],
   vm: [
-    {q:"Vem gjorde flest mål i VM 2002?",a:["Ronaldo","Klose","Zidane"],c:0},
-    {q:"Vilket land vann VM 1958?",a:["Brasilien","Sverige","Tyskland"],c:0},
+    {q:"Vem gjorde flest mål i VM 2002?", a:["Ronaldo","Klose","Zidane"], c:0},
+    {q:"Vilket land vann VM 1958?", a:["Brasilien","Sverige","Tyskland"], c:0}
   ],
   all: [
-    {q:"Vilket lag har flest SM-guld?",a:["AIK","IFK Göteborg","Malmö FF"],c:2},
-    {q:"Vilket år startade Allsvenskan?",a:["1924","1930","1910"],c:0},
+    {q:"Vilket lag har flest SM-guld?", a:["AIK","IFK Göteborg","Malmö FF"], c:2},
+    {q:"Vilket år startade Allsvenskan?", a:["1924","1930","1910"], c:0}
   ]
 };
 
@@ -88,7 +89,8 @@ function enterMenu(){
 
 function startQuiz(type){
   quiz = quizzes[type];
-  current = 0; score = 0;
+  current = 0;
+  score = 0;
   document.getElementById('menu').style.display='none';
   document.getElementById('quiz').style.display='block';
   showQuestion();
@@ -116,27 +118,35 @@ async function finishQuiz(){
   document.getElementById('result').style.display='block';
   document.getElementById('scoreText').innerText = `${user}, du fick ${score} poäng.`;
 
-  const ref = db.collection('players').doc(user);
-  const doc = await ref.get();
-  let total = score;
-  if(doc.exists) total += doc.data().points;
-  await ref.set({ points: total });
+  try {
+    console.log("Försöker spara poäng för:", user);
+    const ref = db.collection('players').doc(user);
+    const doc = await ref.get();
+    let total = score;
+    if(doc.exists) total += doc.data().points;
+    await ref.set({ points: total });
+    console.log("Poäng sparade:", total);
 
-  const snap = await db.collection('players').orderBy('points','desc').get();
-  let rank=0;
-  let top3=document.getElementById('top3'); top3.innerHTML="";
-  snap.forEach(d=>{
-    rank++;
-    if(rank<=3){
-      let li=document.createElement('li'); li.innerText=`${d.id} – ${d.data().points} poäng`;
-      top3.appendChild(li);
-    }
-    if(d.id===user){ document.getElementById('myRank').innerText=`Din plats: #${rank} – ${d.data().points} poäng`; }
-  });
+    const snap = await db.collection('players').orderBy('points','desc').get();
+    let rank=0;
+    let top3=document.getElementById('top3'); top3.innerHTML="";
+    snap.forEach(d=>{
+      rank++;
+      if(rank<=3){
+        let li=document.createElement('li'); li.innerText=`${d.id} – ${d.data().points} poäng`;
+        top3.appendChild(li);
+      }
+      if(d.id===user){ document.getElementById('myRank').innerText=`Din plats: #${rank} – ${d.data().points} poäng`; }
+    });
+  } catch(err){
+    console.error("Fel vid sparande av poäng:", err);
+    alert("Det gick inte att spara poängen till Firebase. Kontrollera config och att Firestore är aktiv.");
+  }
 }
 </script>
 </body>
 </html>
+
 const firebaseConfig = {
     apiKey: "AIzaSyBApn2aTw1V7smbRbtwyvdDpD1iBJvzcY0",
     authDomain: "global-football-quiz.firebaseapp.com",
