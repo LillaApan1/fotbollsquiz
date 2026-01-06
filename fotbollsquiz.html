@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<title>Fotbollsquiz</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #0b6623;
+        color: white;
+        text-align: center;
+        padding: 20px;
+    }
+    .quiz-box {
+        background: #1e8f4f;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 500px;
+        margin: auto;
+    }
+    button {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #145a32;
+        color: white;
+    }
+    input {
+        padding: 8px;
+        font-size: 16px;
+    }
+</style>
+</head>
+<body>
+
+<h1>⚽ Fotbollsquiz</h1>
+
+<div class="quiz-box" id="start">
+    <p>Skriv ditt namn:</p>
+    <input type="text" id="username">
+    <br><br>
+    <button onclick="startQuiz()">Starta Quiz</button>
+</div>
+
+<div class="quiz-box" id="quiz" style="display:none;">
+    <h2 id="question"></h2>
+    <div id="answers"></div>
+</div>
+
+<div class="quiz-box" id="result" style="display:none;">
+    <h2>Quiz klart!</h2>
+    <p id="scoreText"></p>
+    <h3>🏆 Ranking</h3>
+    <ol id="leaderboard"></ol>
+    <button onclick="location.reload()">Spela igen</button>
+</div>
+
+<script>
+const questions = [
+    {
+        q: "Vilket land vann VM 2018?",
+        a: ["Brasilien", "Frankrike", "Tyskland"],
+        c: 1
+    },
+    {
+        q: "Vem har vunnit flest Ballon d'Or?",
+        a: ["Messi", "Ronaldo", "Modric"],
+        c: 0
+    },
+    {
+        q: "Vilket lag spelar på Anfield?",
+        a: ["Chelsea", "Liverpool", "Arsenal"],
+        c: 1
+    }
+];
+
+let current = 0;
+let score = 0;
+let player = "";
+
+function startQuiz() {
+    player = document.getElementById("username").value;
+    if (!player) return alert("Skriv ditt namn!");
+    document.getElementById("start").style.display = "none";
+    document.getElementById("quiz").style.display = "block";
+    showQuestion();
+}
+
+function showQuestion() {
+    let q = questions[current];
+    document.getElementById("question").innerText = q.q;
+    let answersDiv = document.getElementById("answers");
+    answersDiv.innerHTML = "";
+    q.a.forEach((ans, i) => {
+        let btn = document.createElement("button");
+        btn.innerText = ans;
+        btn.onclick = () => checkAnswer(i);
+        answersDiv.appendChild(btn);
+    });
+}
+
+function checkAnswer(i) {
+    if (i === questions[current].c) score++;
+    current++;
+    if (current < questions.length) {
+        showQuestion();
+    } else {
+        finishQuiz();
+    }
+}
+
+function finishQuiz() {
+    document.getElementById("quiz").style.display = "none";
+    document.getElementById("result").style.display = "block";
+    document.getElementById("scoreText").innerText =
+        player + ", du fick " + score + " av " + questions.length + " poäng.";
+
+    let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+    leaderboard.push({ name: player, score: score });
+    leaderboard.sort((a, b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, 10);
+    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+
+    let list = document.getElementById("leaderboard");
+    list.innerHTML = "";
+    leaderboard.forEach(p => {
+        let li = document.createElement("li");
+        li.innerText = p.name + " – " + p.score + " poäng";
+        list.appendChild(li);
+    });
+}
+</script>
+
+</body>
+</html>
