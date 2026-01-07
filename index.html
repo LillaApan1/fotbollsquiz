@@ -39,6 +39,55 @@ input {
   border-radius:8px;
   border:none;
 }
+/* 📱 MOBIL-LAYOUT DELUXE */
+@media (max-width: 600px) {
+
+  body {
+    padding: 0;
+    margin: 0;
+  }
+
+  .box {
+    width: 92%;
+    margin: 12px auto;
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin-top: 12px;
+  }
+
+  h2, h3 {
+    font-size: 18px;
+  }
+
+  button {
+    font-size: 18px;
+    padding: 16px;
+    border-radius: 12px;
+    margin: 10px 0;
+  }
+
+  #question {
+    font-size: 20px;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+
+  #progress {
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  input {
+    font-size: 18px;
+    padding: 14px;
+  }
+
+}
+
 </style>
 </head>
 
@@ -55,6 +104,11 @@ input {
   <button onclick="startQuiz('pl')">Premier League</button>
   <button onclick="startQuiz('vm')">VM</button>
   <button onclick="startQuiz('as')">Allsvenskan</button>
+  <button onclick="startQuiz('sa')">Serie A</button>
+  <button onclick="startQuiz('ll')">La Liga</button>
+  <button onclick="startQuiz('bl')">Bundesliga</button>
+  <button onclick="startQuiz('l1')">Ligue 1</button>
+
 </div>
 
 <div id="quiz" class="box" style="display:none;">
@@ -68,6 +122,7 @@ input {
   <h3>🏆 Topp 3 i världen</h3>
   <ol id="top3"></ol>
   <p id="myRank"></p>
+  <button onclick="backToMenu()">Spela ett annat quiz</button>
 </div>
 
 <script>
@@ -152,6 +207,98 @@ pl: [
 {q:"Vilket lag spelar på Gamla Ullevi?",a:["IFK Göteborg","GAIS","Båda"],c:2},
 {q:"Vilket lag vann 2018?",a:["AIK","Malmö","Hammarby"],c:0},
 {q:"Vilket lag kallas Änglarna?",a:["IFK Göteborg","Elfsborg","Örebro"],c:0}
+]
+,
+sa: [
+{q:"Vilket lag har flest Serie A-titlar?",a:["Juventus","Milan","Inter"],c:0},
+{q:"Vilket lag spelar på San Siro?",a:["Milan","Inter","Båda"],c:2},
+{q:"Vilket lag kallas Bianconeri?",a:["Juventus","Inter","Roma"],c:0},
+{q:"Vem är Serie A:s bästa målskytt genom tiderna?",a:["Silvio Piola","Totti","Del Piero"],c:0},
+{q:"Vilket lag vann Serie A 2023?",a:["Napoli","Inter","Milan"],c:0},
+{q:"🔥 Vilket år grundades Serie A?",a:["1898","1929","1910"],c:1},
+{q:"🔥 Vilken klubb vann 5 titlar i rad 1930-talet?",a:["Juventus","Torino","Inter"],c:1},
+{q:"🔥 Vilken stad har två Serie A-lag?",a:["Milano","Rom","Båda"],c:2},
+{q:"🔥 Flest mål i en Serie A-säsong?",a:["Higuaín","Immobile","Nordahl"],c:0},
+{q:"🔥 Första sydamerikan att vinna skytteligan?",a:["Batistuta","Ronaldo","Tevez"],c:0},
+{q:"Vilket lag kallas Giallorossi?",a:["Roma","Lazio","Napoli"],c:0},
+{q:"Vilket lag vann 2021?",a:["Inter","Milan","Juventus"],c:0},
+{q:"Vilket lag är från Turin?",a:["Juventus","Inter","Roma"],c:0},
+{q:"Vilket lag vann 2022?",a:["Milan","Inter","Napoli"],c:0},
+{q:"Vilket lag spelar på Olimpico?",a:["Roma","Lazio","Båda"],c:2},
+{q:"Vilken färg har Napolis tröjor?",a:["Blå","Röd","Vit"],c:0},
+{q:"Vilket lag har smeknamnet Partenopei?",a:["Napoli","Lazio","Roma"],c:0},
+{q:"Vilket lag vann Serie A 2019?",a:["Juventus","Napoli","Inter"],c:0},
+{q:"Vilken spelare är klubbikon i Roma?",a:["Totti","De Rossi","Båda"],c:2},
+{q:"Vilket lag vann 2020?",a:["Juventus","Inter","Lazio"],c:0}
+]
+,
+ll: [
+{q:"Vilket lag har flest La Liga-titlar?",a:["Real Madrid","Barcelona","Atlético"],c:0},
+{q:"Vilket lag spelar på Camp Nou?",a:["Barcelona","Valencia","Sevilla"],c:0},
+{q:"Vilket lag kallas Los Blancos?",a:["Real Madrid","Valencia","Sevilla"],c:0},
+{q:"Vilket lag vann La Liga 2023?",a:["Barcelona","Real Madrid","Atlético"],c:0},
+{q:"Vilket derby kallas El Clásico?",a:["Real–Barca","Madrid–Atlético","Sevilla–Betis"],c:0},
+{q:"🔥 Flest mål i La Liga-historien?",a:["Messi","Ronaldo","Zarra"],c:0},
+{q:"🔥 Flest matcher i La Liga?",a:["Zubizarreta","Raúl","Xavi"],c:0},
+{q:"🔥 Vilken klubb grundades först?",a:["Sevilla","Real Madrid","Barcelona"],c:0},
+{q:"🔥 Vilket lag har vunnit La Liga obesegrade?",a:["Barcelona","Real Madrid","Atlético"],c:0},
+{q:"🔥 Flest mål i en säsong?",a:["Messi","Ronaldo","Suárez"],c:0},
+{q:"Vilket lag är från Baskien?",a:["Athletic Bilbao","Villarreal","Getafe"],c:0},
+{q:"Vilket lag spelar på Wanda Metropolitano?",a:["Atlético","Valencia","Sevilla"],c:0},
+{q:"Vilket lag vann 2021?",a:["Atlético","Real","Barca"],c:0},
+{q:"Vilken färg har Valencias tröjor?",a:["Vit","Gul","Blå"],c:0},
+{q:"Vilket lag kallas Colchoneros?",a:["Atlético","Sevilla","Valencia"],c:0},
+{q:"Vilket lag vann 2022?",a:["Real Madrid","Barca","Atlético"],c:0},
+{q:"Vilket lag är från Galicien?",a:["Celta Vigo","Betis","Osasuna"],c:0},
+{q:"Vilket lag spelar på Mestalla?",a:["Valencia","Villarreal","Levante"],c:0},
+{q:"Vilket lag vann 2019?",a:["Barcelona","Real Madrid","Atlético"],c:0},
+{q:"Vilket lag är från Andalusien?",a:["Sevilla","Real Sociedad","Espanyol"],c:0}
+]
+,
+bl: [
+{q:"Vilket lag har flest Bundesliga-titlar?",a:["Bayern München","Borussia Dortmund","Werder Bremen"],c:0},
+{q:"Vilket lag spelar på Signal Iduna Park?",a:["Dortmund","Schalke","Leverkusen"],c:0},
+{q:"Vilket lag kallas Die Bayern?",a:["Bayern München","Stuttgart","Hamburg"],c:0},
+{q:"Vilket lag vann Bundesliga 2023?",a:["Bayern München","Borussia Dortmund","RB Leipzig"],c:0},
+{q:"Vilket lag är från Leipzig?",a:["RB Leipzig","Dynamo Dresden","Union Berlin"],c:0},
+{q:"🔥 Flest mål i Bundesliga-historien?",a:["Gerd Müller","Lewandowski","Klose"],c:0},
+{q:"🔥 Flest mål i en Bundesliga-säsong?",a:["Lewandowski","Gerd Müller","Haaland"],c:0},
+{q:"🔥 Vilket lag vann Bundesliga obesegrade 2014?",a:["Bayern München","Dortmund","Ingen"],c:2},
+{q:"🔥 Vilket lag har smeknamnet Die Werkself?",a:["Leverkusen","Wolfsburg","Hoffenheim"],c:0},
+{q:"🔥 Första Bundesliga-säsongen spelades?",a:["1963","1950","1970"],c:0},
+{q:"Vilket lag spelar på Allianz Arena?",a:["Bayern München","1860 München","Båda"],c:0},
+{q:"Vilket lag kallas Die Schwarzgelben?",a:["Dortmund","Bremen","Schalke"],c:0},
+{q:"Vilket lag är från Berlin?",a:["Union Berlin","Leverkusen","Mainz"],c:0},
+{q:"Vilket lag vann Bundesliga 2022?",a:["Bayern München","Dortmund","Leipzig"],c:0},
+{q:"Vilket lag har smeknamnet Die Fohlen?",a:["Mönchengladbach","Freiburg","Augsburg"],c:0},
+{q:"Vilket lag är från Hamburg?",a:["Hamburg SV","St. Pauli","Båda"],c:1},
+{q:"Vilket lag spelar på Weserstadion?",a:["Werder Bremen","Hamburg","Hannover"],c:0},
+{q:"Vilket lag vann Bundesliga 2019?",a:["Bayern München","Dortmund","Leipzig"],c:0},
+{q:"Vilket lag är känt som Die Adler?",a:["Eintracht Frankfurt","Freiburg","Mainz"],c:0},
+{q:"Vilket lag vann Bundesliga 2020?",a:["Bayern München","Leverkusen","Dortmund"],c:0}
+]
+,
+l1: [
+{q:"Vilket lag har flest Ligue 1-titlar?",a:["Saint-Étienne","PSG","Marseille"],c:0},
+{q:"Vilket lag spelar på Parc des Princes?",a:["PSG","Lyon","Marseille"],c:0},
+{q:"Vilket lag vann Ligue 1 2023?",a:["PSG","Lens","Marseille"],c:0},
+{q:"Vilket lag kallas Les Parisiens?",a:["PSG","Lille","Monaco"],c:0},
+{q:"Vilket lag är från Monaco?",a:["Monaco","Nice","Lyon"],c:0},
+{q:"🔥 Flest mål i Ligue 1-historien?",a:["Delio Onnis","Mbappé","Pauleta"],c:0},
+{q:"🔥 Vilket lag vann Ligue 1 obesegrade 1995?",a:["Nantes","PSG","Marseille"],c:0},
+{q:"🔥 Första säsongen av Ligue 1 spelades?",a:["1932","1920","1945"],c:0},
+{q:"🔥 Vilket lag har smeknamnet Les Verts?",a:["Saint-Étienne","Lyon","Bordeaux"],c:0},
+{q:"🔥 Flest titlar i rad?",a:["PSG","Lyon","Marseille"],c:1},
+{q:"Vilket lag vann 2022?",a:["PSG","Lille","Monaco"],c:0},
+{q:"Vilket lag är från Marseille?",a:["Marseille","Nice","Rennes"],c:0},
+{q:"Vilket lag spelar på Velodrome?",a:["Marseille","PSG","Lyon"],c:0},
+{q:"Vilket lag kallas Les Gones?",a:["Lyon","Lille","Nice"],c:0},
+{q:"Vilket lag vann 2021?",a:["Lille","PSG","Monaco"],c:0},
+{q:"Vilket lag är från Bordeaux?",a:["Bordeaux","Toulouse","Nantes"],c:0},
+{q:"Vilket lag vann 2020?",a:["PSG","Lyon","Marseille"],c:0},
+{q:"Vilket lag är från Bretagne?",a:["Rennes","Nice","Lens"],c:0},
+{q:"Vilket lag spelar på Groupama Stadium?",a:["Lyon","PSG","Monaco"],c:0},
+{q:"Vilket lag vann Ligue 1 2019?",a:["PSG","Lille","Monaco"],c:0}
 ]
 
 };
@@ -260,7 +407,15 @@ async function finish(){
     }
   });
 }
-</script>
+function backToMenu() {
+  current = 0;
+  score = 0;
+  quiz = [];
 
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('menu').style.display = 'block';
+}
+
+</script>
 </body>
 </html>
