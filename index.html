@@ -85,18 +85,75 @@ const db = firebase.firestore();
 /* ================= QUIZDATA ================= */
 
 const quizzes = {
-  pl: [
-    {q:"Vilken spelare gjorde flest mål PL 2007/08?", a:["Ronaldo","Drogba","Henry"], c:0},
-    {q:"Vilket lag vann PL säsongen 2015/16?", a:["Chelsea","Leicester","Arsenal"], c:1}
-  ],
+pl: [
+{q:"Vilket lag vann Premier League 2015/16?",a:["Chelsea","Leicester","Arsenal"],c:1},
+{q:"Flest mål under en PL-säsong?",a:["Salah","Haaland","Suárez"],c:1},
+{q:"Vilket lag har flest PL-titlar?",a:["Man United","Chelsea","Man City"],c:0},
+{q:"Vem gjorde målet som säkrade Man Citys titel 2012?",a:["Agüero","Silva","Touré"],c:0},
+{q:"Vilket lag åkte ur PL 2007/08 trots 40 poäng?",a:["Birmingham","Reading","Derby"],c:1},
+{q:"🔥 Första utländska spelaren som blev PL-skyttekung?",a:["Cantona","Henry","Bergkamp"],c:0},
+{q:"🔥 Vilket lag hade 'Invincibles'?",a:["Chelsea","Arsenal","Man United"],c:1},
+{q:"🔥 Rekord för flest assist på en säsong?",a:["De Bruyne","Henry","Özil"],c:0},
+{q:"🔥 Första laget som vann PL utan att spela i Europa?",a:["Blackburn","Leicester","Chelsea"],c:0},
+{q:"🔥 Vilken tränare vann flest matcher i PL-historien?",a:["Ferguson","Guardiola","Wenger"],c:0},
+{q:"Vilket lag spelar på Anfield?",a:["Everton","Liverpool","Leeds"],c:1},
+{q:"Vilken klubb kallades 'The Invincibles'?",a:["Arsenal","Chelsea","City"],c:0},
+{q:"Vilket år startade Premier League?",a:["1992","1988","1995"],c:0},
+{q:"Vem har flest röda kort i PL?",a:["Vieira","Dunne","Keane"],c:1},
+{q:"Vilket lag vann PL 2020?",a:["Liverpool","City","Chelsea"],c:0},
+{q:"Vem är PL:s bästa målskytt genom tiderna?",a:["Shearer","Kane","Rooney"],c:0},
+{q:"Vilken klubb har smeknamnet Spurs?",a:["Arsenal","Tottenham","West Ham"],c:1},
+{q:"Vilket lag vann PL flest gånger på 90-talet?",a:["United","Arsenal","Blackburn"],c:0},
+{q:"Vilken spelare kallas 'King of assists'?",a:["Giggs","De Bruyne","Lampard"],c:0},
+{q:"Vilket lag spelar på Old Trafford?",a:["Leeds","Man United","Everton"],c:1}
+]
+,
   vm: [
-    {q:"VM 1998 vanns av?", a:["Brasilien","Frankrike","Italien"], c:1},
-    {q:"Flest VM-mål totalt?", a:["Ronaldo","Klose","Pelé"], c:1}
-  ],
+{q:"Vilket land vann VM 2018?",a:["Frankrike","Kroatien","Brasilien"],c:0},
+{q:"Flest VM-mål totalt?",a:["Klose","Ronaldo","Pelé"],c:0},
+{q:"VM 2002 vanns av?",a:["Brasilien","Tyskland","Italien"],c:0},
+{q:"Vilket land har flest VM-guld?",a:["Brasilien","Tyskland","Italien"],c:0},
+{q:"Första VM spelades år?",a:["1930","1934","1928"],c:0},
+{q:"🔥 Första afrikanska laget till kvartsfinal?",a:["Kamerun","Nigeria","Senegal"],c:0},
+{q:"🔥 Vem gjorde 'Hand of God'?",a:["Maradona","Pelé","Messi"],c:0},
+{q:"🔥 Flest mål i ett VM?",a:["Just Fontaine","Klose","Ronaldo"],c:0},
+{q:"🔥 VM-final 1950 spelades i?",a:["Brasilien","Uruguay","Chile"],c:0},
+{q:"🔥 Enda landet som spelat alla VM?",a:["Brasilien","Tyskland","Argentina"],c:0},
+{q:"Vilket land vann VM 2014?",a:["Tyskland","Brasilien","Argentina"],c:0},
+{q:"VM 2010 hölls i?",a:["Sydafrika","Brasilien","Japan"],c:0},
+{q:"Vilken spelare vann VM 2022?",a:["Messi","Mbappé","Neymar"],c:0},
+{q:"Vilket land var värd 2022?",a:["Qatar","UAE","Saudiarabien"],c:0},
+{q:"Vilket land vann VM 1998?",a:["Frankrike","Brasilien","Italien"],c:0},
+{q:"Vilken spelare gjorde flest mål VM 2018?",a:["Kane","Griezmann","Mbappé"],c:0},
+{q:"VM spelas vart?",a:["4:e år","2:e år","6:e år"],c:0},
+{q:"Vilket land slog Brasilien 7–1?",a:["Tyskland","Frankrike","Nederländerna"],c:0},
+{q:"Vilket land vann VM 2006?",a:["Italien","Frankrike","Brasilien"],c:0},
+{q:"Vilket lag vann VM 1930?",a:["Uruguay","Argentina","Brasilien"],c:0}
+]
+,
   as: [
-    {q:"Vilket lag har flest SM-guld?", a:["Malmö FF","AIK","IFK Göteborg"], c:0},
-    {q:"Allsvenskan startade vilket år?", a:["1910","1924","1935"], c:1}
-  ]
+{q:"Vilket lag har flest SM-guld?",a:["Malmö FF","IFK Göteborg","AIK"],c:0},
+{q:"Allsvenskan startade?",a:["1924","1910","1930"],c:0},
+{q:"Vilket lag vann Allsvenskan 2023?",a:["Malmö FF","Elfsborg","Häcken"],c:1},
+{q:"Vilket lag spelar på Tele2 Arena?",a:["AIK","Djurgården","Båda"],c:2},
+{q:"Vilket lag kallas Blåvitt?",a:["IFK Göteborg","IFK Norrköping","Helsingborg"],c:0},
+{q:"🔥 Vilket lag vann Allsvenskan 2001?",a:["Hammarby","AIK","Djurgården"],c:0},
+{q:"🔥 Flest mål i Allsvenskan genom tiderna?",a:["Sven Jonasson","Zlatan","Nordahl"],c:0},
+{q:"🔥 Första laget från Norrland i Allsvenskan?",a:["GIF Sundsvall","Östersund","Gefle"],c:0},
+{q:"🔥 Vilket lag har spelat flest säsonger?",a:["AIK","IFK Göteborg","Malmö FF"],c:0},
+{q:"🔥 Största segern någonsin?",a:["12–0","11–1","10–0"],c:0},
+{q:"Vilket lag vann 2020?",a:["Malmö FF","Djurgården","Häcken"],c:0},
+{q:"Vilket lag kallas Bajen?",a:["Hammarby","AIK","Djurgården"],c:0},
+{q:"Vilket lag spelar på Eleda Stadion?",a:["Malmö FF","Helsingborg","Trelleborg"],c:0},
+{q:"Vilket lag vann 2019?",a:["Djurgården","AIK","Malmö"],c:0},
+{q:"Vilket lag kallas Gnaget?",a:["AIK","Djurgården","Hammarby"],c:0},
+{q:"Vilket lag vann 2022?",a:["Häcken","Malmö","Elfsborg"],c:0},
+{q:"Vilken stad har flest derbyn?",a:["Stockholm","Göteborg","Malmö"],c:0},
+{q:"Vilket lag spelar på Gamla Ullevi?",a:["IFK Göteborg","GAIS","Båda"],c:2},
+{q:"Vilket lag vann 2018?",a:["AIK","Malmö","Hammarby"],c:0},
+{q:"Vilket lag kallas Änglarna?",a:["IFK Göteborg","Elfsborg","Örebro"],c:0}
+]
+
 };
 
 /* ================= VARIABLER ================= */
