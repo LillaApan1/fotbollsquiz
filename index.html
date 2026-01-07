@@ -1,191 +1,209 @@
-<!-- UPPDATERAD VERSION MED FULLA QUIZ, 20 FRÅGOR VAR, GLOBAL RANKING & FUSKSKYDD -->
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Globalt Fotbollsquiz</title>
-<style>
-body { font-family: 'Segoe UI',Arial,sans-serif; background:radial-gradient(circle at top,#0f9d58,#0b6623); color:white; margin:0; padding:10px; text-align:center;}
-.box { background:rgba(30,143,79,0.95); max-width:520px; margin:20px auto; padding:22px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.35); animation:fadeIn .4s ease;}
-@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
-button { width:100%; padding:14px; margin:8px 0; border:none; border-radius:12px; font-size:16px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#1aff7a,#0bbf5a); color:#064d2a; transition:transform .1s ease, box-shadow .1s ease; box-shadow:0 4px 10px rgba(0,0,0,.25);} 
-button:hover { transform:scale(1.02); box-shadow:0 6px 14px rgba(0,0,0,.35);} 
-button:active { transform:scale(.98);} 
-input { width:90%; padding:12px; font-size:16px; border-radius:10px; border:none; text-align:center;}
-ol { text-align:left; }
-.progressbar { height:10px; width:100%; background:#0a4d2b; border-radius:6px; overflow:hidden; margin-top:10px; }
-.progressbar span { display:block; height:100%; width:100%; background:linear-gradient(90deg,#1aff7a,#0bbf5a); transition:width 1s linear; }
-.timer-low span { background:linear-gradient(90deg,#ff3b3b,#ff7a3b); }
-</style>
-</head>
-<body>
-<h1>⚽ Globalt Fotbollsquiz</h1>
-<div class="box" id="login">
-  <p>Ditt namn (unika namn ger rätt ranking):</p>
-  <input id="username" placeholder="Skriv ditt namn" />
-  <button onclick="enterMenu()">Fortsätt</button>
-</div>
-<div class="box" id="menu" style="display:none;">
-  <h2>Välj quiz</h2>
-  <button onclick="startQuiz('pl')">Premier League (20 frågor)</button>
-  <button onclick="startQuiz('vm')">VM (20 frågor)</button>
-  <button onclick="startQuiz('all')">Allsvenskan (20 frågor)</button>
-</div>
-<div class="box" id="quiz" style="display:none;">
-  <h3 id="question"></h3>
-  <div id="answers"></div>
-  <div class="progressbar"><span id="timebar"></span></div>
-  <p id="progress"></p>
-</div>
-  <p id="progress"></p>
-</div>
-<div class="box" id="result" style="display:none;">
-  <h2>Quiz klart!</h2>
-  <p id="scoreText"></p>
-  <h3>🌍 Top 3 i världen</h3>
-  <ol id="top3"></ol>
-  <p id="myRank"></p>
-  <button onclick="location.reload()">Tillbaka till start</button>
-</div>
+<meta charset="UTF-8">
+<title>Fotbollsquiz</title>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background: linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+  color:white;
+  text-align:center;
+}
+.box {
+  max-width:500px;
+  margin:50px auto;
+  background:rgba(0,0,0,0.6);
+  padding:25px;
+  border-radius:15px;
+}
+button {
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+button:hover { opacity:0.9; }
+input {
+  width:100%;
+  padding:12px;
+  font-size:16px;
+  border-radius:8px;
+  border:none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="login" class="box">
+  <h2>Skriv ditt namn</h2>
+  <input id="username" placeholder="Ditt namn">
+  <button id="startBtn">Fortsätt</button>
+</div>
+
+<div id="menu" class="box" style="display:none;">
+  <h2>Välj quiz</h2>
+  <button onclick="startQuiz('pl')">Premier League</button>
+  <button onclick="startQuiz('vm')">VM</button>
+  <button onclick="startQuiz('as')">Allsvenskan</button>
+</div>
+
+<div id="quiz" class="box" style="display:none;">
+  <h3 id="progress"></h3>
+  <h2 id="question"></h2>
+  <div id="answers"></div>
+</div>
+
+<div id="result" class="box" style="display:none;">
+  <h2 id="scoreText"></h2>
+  <h3>🏆 Topp 3 i världen</h3>
+  <ol id="top3"></ol>
+  <p id="myRank"></p>
+</div>
+
 <script>
+/* ================= FIREBASE ================= */
+
 const firebaseConfig = {
   apiKey: "AIzaSyBApn2aTw1V7smbRbtwyvdDpD1iBJvzcY0",
   authDomain: "global-football-quiz.firebaseapp.com",
   projectId: "global-football-quiz",
 };
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-let user = "";
-let quiz = [];
-let current = 0;
-let score = 0;
-// 🔥 RIKTIGA FRÅGOR (20 per quiz – svåra men rimliga 13–20 år)
+
+/* ================= QUIZDATA ================= */
+
 const quizzes = {
   pl: [
-    {q:"Vilken klubb vann Premier League säsongen 2015/16?",a:["Chelsea","Leicester City","Arsenal"],c:1},
-    {q:"Vilken spelare har gjort flest mål i Premier League genom tiderna?",a:["Wayne Rooney","Alan Shearer","Sergio Agüero"],c:1},
-    {q:"Vilken manager tog Liverpool till ligatitel 2020?",a:["Jürgen Klopp","Rafael Benítez","Brendan Rodgers"],c:0},
-    {q:"Vilken klubb spelar sina hemmamatcher på Etihad Stadium?",a:["Manchester United","Manchester City","Everton"],c:1},
-    {q:"Vilken klubb har smeknamnet 'The Gunners'?",a:["Arsenal","Tottenham","Chelsea"],c:0},
-    {q:"Vilket lag har vunnit Premier League flest gånger?",a:["Liverpool","Manchester United","Chelsea"],c:1},
-    {q:"Vilken spelare gjorde 32 mål säsongen 2017/18?",a:["Harry Kane","Mohamed Salah","Kevin De Bruyne"],c:1},
-    {q:"Vilken klubb kallas 'The Toffees'?",a:["Everton","Leeds","West Ham"],c:0},
-    {q:"Vilken tränare har vunnit Premier League flest gånger?",a:["Pep Guardiola","Alex Ferguson","José Mourinho"],c:1},
-    {q:"Vilket år startade Premier League?",a:["1990","1992","1995"],c:1},
-    {q:"Vilken spelare har flest assist genom tiderna i PL?",a:["Ryan Giggs","Cesc Fàbregas","Kevin De Bruyne"],c:0},
-    {q:"Vilken klubb har hemmaarena Anfield?",a:["Liverpool","Aston Villa","Newcastle"],c:0},
-    {q:"Vilken spelare kallas 'The Egyptian King'?",a:["Mané","Salah","Mahrez"],c:1},
-    {q:"Vilken klubb vann Premier League 2022/23?",a:["Arsenal","Manchester City","Liverpool"],c:1},
-    {q:"Vilket lag åkte ur PL 2020/21 med 13 poäng?",a:["Derby","Sheffield United","Norwich"],c:1},
-    {q:"Vilken spelare gjorde flest mål för Tottenham i PL?",a:["Harry Kane","Son","Bale"],c:0},
-    {q:"Vilken klubb kallas 'The Blues'?",a:["Chelsea","Everton","Leicester"],c:0},
-    {q:"Vilken tränare leder Manchester City?",a:["Guardiola","Arteta","Ten Hag"],c:0},
-    {q:"Vilken arena är störst i PL?",a:["Old Trafford","Emirates","Tottenham Stadium"],c:0},
-    {q:"Vilken klubb vann PL utan en enda bortaförlust 2003/04?",a:["Chelsea","Arsenal","Man United"],c:1}
+    {q:"Vilken spelare gjorde flest mål PL 2007/08?", a:["Ronaldo","Drogba","Henry"], c:0},
+    {q:"Vilket lag vann PL säsongen 2015/16?", a:["Chelsea","Leicester","Arsenal"], c:1}
   ],
   vm: [
-    {q:"Vilket land vann VM 2018?",a:["Brasilien","Frankrike","Tyskland"],c:1},
-    {q:"Vem gjorde flest mål i VM 2002?",a:["Ronaldo","Klose","Ronaldinho"],c:0},
-    {q:"Vilket land arrangerade VM 2014?",a:["Sydafrika","Brasilien","Ryssland"],c:1},
-    {q:"Vilket land har flest VM-guld?",a:["Tyskland","Brasilien","Italien"],c:1},
-    {q:"Vilken spelare vann Guldbollen VM 2014?",a:["Messi","Neymar","Kroos"],c:0},
-    {q:"Vilket år vann Sverige VM-silver?",a:["1958","1954","1962"],c:0},
-    {q:"Vem gjorde 'Guds hand'-målet?",a:["Pelé","Maradona","Zidane"],c:1},
-    {q:"Vilket land vann VM 2006?",a:["Frankrike","Italien","Brasilien"],c:1},
-    {q:"Vilken spelare har flest VM-mål totalt?",a:["Ronaldo","Klose","Messi"],c:1},
-    {q:"Vilket land arrangerade första VM 1930?",a:["Uruguay","Italien","Frankrike"],c:0},
-    {q:"Vilket lag slog Sverige i VM 2018 kvartsfinal?",a:["England","Frankrike","Belgien"],c:0},
-    {q:"Vilket land vann VM 2022?",a:["Frankrike","Argentina","Kroatien"],c:1},
-    {q:"Vilken svensk gjorde mål i VM 1994-semifinalen?",a:["Brolin","Larsson","Dahlin"],c:0},
-    {q:"Vilket land förlorade VM-finalen 1958?",a:["Sverige","Brasilien","Frankrike"],c:0},
-    {q:"Vilket land har spelat flest VM-finaler?",a:["Brasilien","Tyskland","Italien"],c:1},
-    {q:"Vilken spelare gjorde finalmålet VM 2010?",a:["Iniesta","Villa","Xavi"],c:0},
-    {q:"Vilket land vann VM 1998?",a:["Brasilien","Frankrike","Argentina"],c:1},
-    {q:"Vilket land arrangerade VM 2002?",a:["Japan & Korea","USA","Tyskland"],c:0},
-    {q:"Vilken spelare gjorde flest mål VM 2014?",a:["Messi","James Rodríguez","Müller"],c:1},
-    {q:"Vilket land vann VM 1954?",a:["Ungern","Tyskland","Brasilien"],c:1}
+    {q:"VM 1998 vanns av?", a:["Brasilien","Frankrike","Italien"], c:1},
+    {q:"Flest VM-mål totalt?", a:["Ronaldo","Klose","Pelé"], c:1}
   ],
-  all: [
-    {q:"Vilket lag har flest SM-guld?",a:["IFK Göteborg","Malmö FF","AIK"],c:0},
-    {q:"Vilket år startade Allsvenskan?",a:["1924","1910","1935"],c:0},
-    {q:"Vilket lag vann Allsvenskan 2023?",a:["Malmö FF","Elfsborg","Häcken"],c:1},
-    {q:"Vilken arena är störst i Allsvenskan?",a:["Friends Arena","Ullevi","Tele2 Arena"],c:0},
-    {q:"Vilket lag kallas 'Blåvitt'?",a:["IFK Göteborg","IFK Norrköping","Halmstad"],c:0},
-    {q:"Vilken klubb spelar på Tele2 Arena?",a:["AIK","Djurgården","Hammarby"],c:1},
-    {q:"Vilket lag vann Allsvenskan 2022?",a:["Häcken","AIK","Malmö FF"],c:0},
-    {q:"Vilket lag har flest derbyn i Stockholm?",a:["AIK","Djurgården","Hammarby"],c:0},
-    {q:"Vilket lag vann Allsvenskan 2020?",a:["Malmö FF","Djurgården","Elfsborg"],c:0},
-    {q:"Vilken färg har IFK Norrköping?",a:["Blå-vit","Röd-vit","Grön-vit"],c:0},
-    {q:"Vilken klubb vann SM-guld 2019?",a:["Djurgården","Malmö FF","AIK"],c:0},
-    {q:"Vilket lag har smeknamnet 'Gnaget'?",a:["AIK","Hammarby","Djurgården"],c:0},
-    {q:"Vilket lag spelar på Borås Arena?",a:["Elfsborg","Häcken","Kalmar"],c:0},
-    {q:"Vilket lag vann Allsvenskan 2018?",a:["AIK","Häcken","Malmö FF"],c:0},
-    {q:"Vilket lag har hemmaarena Strandvallen?",a:["Mjällby","Kalmar","Varberg"],c:0},
-    {q:"Vilket lag vann Allsvenskan 2021?",a:["Malmö FF","Djurgården","AIK"],c:1},
-    {q:"Vilken klubb har flest raka SM-guld?",a:["IFK Göteborg","Malmö FF","AIK"],c:0},
-    {q:"Vilket lag spelar på PlatinumCars Arena?",a:["Norrköping","Helsingborg","Sirius"],c:0},
-    {q:"Vilket lag vann Allsvenskan 2017?",a:["Malmö FF","AIK","Östersund"],c:1},
-    {q:"Vilket lag kallas 'Di blåe'?",a:["IFK Göteborg","Elfsborg","Malmö FF"],c:0}
+  as: [
+    {q:"Vilket lag har flest SM-guld?", a:["Malmö FF","AIK","IFK Göteborg"], c:0},
+    {q:"Allsvenskan startade vilket år?", a:["1910","1924","1935"], c:1}
   ]
 };
-function enterMenu(){ user=document.getElementById('username').value.trim(); if(!user) return alert('Skriv namn'); document.getElementById('login').style.display='none'; document.getElementById('menu').style.display='block'; }
+
+/* ================= VARIABLER ================= */
+
+let user="";
+let quiz=[];
+let current=0;
+let score=0;
+let timeLeft=10;
+let timer=null;
+
+/* ================= LOGIN ================= */
+
+document.getElementById("startBtn").onclick = () => {
+  const name = document.getElementById("username").value.trim();
+  if(!name){ alert("Skriv ditt namn"); return; }
+  user=name;
+  document.getElementById("login").style.display="none";
+  document.getElementById("menu").style.display="block";
+};
+
+/* ================= QUIZ ================= */
+
 function startQuiz(type){
-  quiz = [...quizzes[type]];
-  // 🔀 Slumpa frågornas ordning (Fisher-Yates)
-  for(let i=quiz.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [quiz[i],quiz[j]]=[quiz[j],quiz[i]];
-  }
-  current=0; score=0;
-  document.getElementById('menu').style.display='none';
-  document.getElementById('quiz').style.display='block';
+  quiz=[...quizzes[type]].sort(()=>Math.random()-0.5);
+  current=0;
+  score=0;
+  document.getElementById("menu").style.display="none";
+  document.getElementById("quiz").style.display="block";
   showQuestion();
 }
-let timerInterval; let timeLeft=10;
-let timerInterval; let timeLeft=10;
+
 function showQuestion(){
-  clearInterval(timerInterval);
+  clearInterval(timer);
   timeLeft=10;
 
-  // 🎨 Automatisk bakgrund per quiztyp (neutrala stadionbilder)
-  const backgrounds={
-    pl:"https://images.unsplash.com/photo-1505842465776-3a8f8f85bfe4",
-    vm:"https://images.unsplash.com/photo-1518091043644-c1d4457512c6",
-    all:"https://images.unsplash.com/photo-1603808033192-082d6919d3e1"
-  };
-  document.getElementById('quiz').style.backgroundImage=`linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url(${backgrounds[currentQuizType]})`;
-  document.getElementById('quiz').style.backgroundSize='cover';
-  document.getElementById('quiz').style.backgroundPosition='center';
+  const q=quiz[current];
+  document.getElementById("question").innerText=q.q;
+  document.getElementById("progress").innerText=
+    `Fråga ${current+1} av ${quiz.length} ⏱️ ${timeLeft}s`;
 
-  let q=quiz[current];
-  document.getElementById('question').innerText=q.q;
-  document.getElementById('progress').innerText=`Fråga ${current+1} av 20 ⏱️ ${timeLeft}s`;
-  let bar=document.getElementById('timebar'); bar.style.width='100%'; bar.parentElement.classList.remove('timer-low');
+  const answers=document.getElementById("answers");
+  answers.innerHTML="";
 
-  let a=document.getElementById('answers'); a.innerHTML="";
-  q.a.forEach((ans,i)=>{ let b=document.createElement('button'); b.innerText=ans; b.onclick=()=>checkAnswer(i); a.appendChild(b); });
+  q.a.forEach((text,i)=>{
+    const btn=document.createElement("button");
+    btn.innerText=text;
+    btn.onclick=()=>answer(i);
+    answers.appendChild(btn);
+  });
 
-  timerInterval=setInterval(()=>{
+  timer=setInterval(()=>{
     timeLeft--;
-    bar.style.width=`${(timeLeft/10)*100}%`;
-    document.getElementById('progress').innerText=`Fråga ${current+1} av 20 ⏱️ ${timeLeft}s`;
-    if(timeLeft<=3) bar.parentElement.classList.add('timer-low');
-    if(timeLeft<=0){ clearInterval(timerInterval); current++; current<20?showQuestion():finishQuiz(); }
-  },1000);
-} av 20 ⏱️ ${timeLeft}s`;
-  let a=document.getElementById('answers'); a.innerHTML="";
-  q.a.forEach((ans,i)=>{ let b=document.createElement('button'); b.innerText=ans; b.onclick=()=>checkAnswer(i); a.appendChild(b); });
-  timerInterval=setInterval(()=>{
-    timeLeft--;
-    document.getElementById('progress').innerText=`Fråga ${current+1} av 20 ⏱️ ${timeLeft}s`;
-    if(timeLeft<=0){ clearInterval(timerInterval); current++; current<20?showQuestion():finishQuiz(); }
+    document.getElementById("progress").innerText=
+      `Fråga ${current+1} av ${quiz.length} ⏱️ ${timeLeft}s`;
+    if(timeLeft<=0){
+      clearInterval(timer);
+      next();
+    }
   },1000);
 }
-function checkAnswer(i){ if(i===quiz[current].c) score++; current++; current<20 ? showQuestion() : finishQuiz(); }
-async function finishQuiz(){ document.getElementById('quiz').style.display='none'; document.getElementById('result').style.display='block'; document.getElementById('scoreText').innerText=`${user}, du fick ${score} poäng.`; const ref=db.collection('players').doc(user); const doc=await ref.get(); let total=score; if(doc.exists) total+=doc.data().points; await ref.set({points:total}); const snap=await db.collection('players').orderBy('points','desc').get(); let rank=0; let top3=document.getElementById('top3'); top3.innerHTML=""; snap.forEach(d=>{ rank++; if(rank<=3){ let li=document.createElement('li'); li.innerText=`${d.id} – ${d.data().points} poäng`; top3.appendChild(li);} if(d.id===user){ document.getElementById('myRank').innerText=`Din plats i världen: #${rank} (${d.data().points} poäng)`; }}); }
+
+function answer(i){
+  if(i===quiz[current].c) score++;
+  next();
+}
+
+function next(){
+  current++;
+  current<quiz.length ? showQuestion() : finish();
+}
+
+/* ================= RESULT ================= */
+
+async function finish(){
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("result").style.display="block";
+  document.getElementById("scoreText").innerText=
+    `${user}, du fick ${score} poäng`;
+
+  const ref=db.collection("players").doc(user);
+  const snap=await ref.get();
+  let total=score;
+  if(snap.exists) total+=snap.data().points;
+  await ref.set({points:total});
+
+  const list=await db.collection("players")
+    .orderBy("points","desc").get();
+
+  let rank=0;
+  const top3=document.getElementById("top3");
+  top3.innerHTML="";
+
+  list.forEach(d=>{
+    rank++;
+    if(rank<=3){
+      const li=document.createElement("li");
+      li.innerText=`${d.id} – ${d.data().points} poäng`;
+      top3.appendChild(li);
+    }
+    if(d.id===user){
+      document.getElementById("myRank").innerText=
+        `Din plats i världen: #${rank} (${d.data().points} poäng)`;
+    }
+  });
+}
 </script>
+
 </body>
 </html>
