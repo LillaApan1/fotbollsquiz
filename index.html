@@ -95,29 +95,7 @@ input {
     padding: 14px;
   }
 
-@media (max-width: 600px) {
-
-  button {
-    min-height: 56px;        /* Googles rekommenderade touch-yta */
-    font-size: 18px;
-    margin: 12px 0;
-  }
-
-  .box {
-    min-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  #question {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 18px;
-  }
-
 }
-
 
 </style>
 </head>
@@ -139,6 +117,9 @@ input {
   <button onclick="startQuiz('ll')">La Liga</button>
   <button onclick="startQuiz('bl')">Bundesliga</button>
   <button onclick="startQuiz('l1')">Ligue 1</button>
+  <button onclick="startQuiz('cl')">Champions League</button>
+  <button onclick="startQuiz('em')">EM</button>
+
 
 </div>
 
@@ -331,6 +312,52 @@ l1: [
 {q:"Vilket lag spelar på Groupama Stadium?",a:["Lyon","PSG","Monaco"],c:0},
 {q:"Vilket lag vann Ligue 1 2019?",a:["PSG","Lille","Monaco"],c:0}
 ]
+,
+cl: [
+  { q:"Vilken klubb har vunnit Champions League flest gånger?", a:["Real Madrid","AC Milan","Liverpool","Bayern München"], c:0 },
+  { q:"Vad hette turneringen före 1992?", a:["Europacupen","UEFA-cupen","Mästarserien","Champions Trophy"], c:0 },
+  { q:"Vem har gjort flest mål i Champions League?", a:["Messi","Ronaldo","Lewandowski","Raúl"], c:1 },
+  { q:"Vilken klubb vann Champions League 2023?", a:["Manchester City","Inter","Real Madrid","Bayern"], c:0 },
+  { q:"Var spelades finalen 2012?", a:["Wembley","Allianz Arena","San Siro","Camp Nou"], c:1 },
+  { q:"Vem avgjorde finalen 1999 i slutminuterna?", a:["Solskjær","Beckham","Giggs","Scholes"], c:0 },
+  { q:"Vilken klubb förlorade med 8–2 mot Bayern 2020?", a:["Barcelona","Chelsea","PSG","Arsenal"], c:0 },
+  { q:"Vilken klubb vann fem raka CL-titlar?", a:["Real Madrid","Ajax","Bayern","Milan"], c:0 },
+  { q:"Vem är yngsta målskytt i CL?", a:["Bojan","Ansu Fati","Mbappé","Bellingham"], c:0 },
+  { q:"Vilken klubb stod för miraklet i finalen 2005?", a:["Liverpool","Milan","Chelsea","Porto"], c:0 },
+  { q:"Vilken tränare har flest CL-titlar?", a:["Ancelotti","Guardiola","Ferguson","Mourinho"], c:0 },
+  { q:"Vilken klubb spelade Drogba för 2012?", a:["Chelsea","Marseille","Lyon","Monaco"], c:0 },
+  { q:"I vilken stad spelades finalen 2020?", a:["Lissabon","Paris","Istanbul","Madrid"], c:0 },
+  { q:"Vilken klubb vann första Champions League?", a:["Marseille","Milan","Porto","Ajax"], c:0 },
+  { q:"Vem gjorde det snabbaste CL-målet?", a:["Roy Makaay","Messi","Ronaldo","Haaland"], c:0 },
+  { q:"Vilken klubb nådde finalen 2020?", a:["PSG","Lyon","Leipzig","Atalanta"], c:0 },
+  { q:"Vilket land har flest CL-titlar?", a:["Spanien","England","Italien","Tyskland"], c:0 },
+  { q:"Vilken klubb vann CL 2021?", a:["Chelsea","Man City","PSG","Bayern"], c:0 },
+  { q:"Vem gjorde avgörande målet i finalen 2014?", a:["Ramos","Bale","Benzema","Ronaldo"], c:0 },
+  { q:"Vilken klubb kallas Los Blancos?", a:["Real Madrid","Valencia","Sevilla","Atletico Madrid"], c:0 }
+ ]
+ ,
+em: [
+  { q:"Vilket land har vunnit EM flest gånger?", a:["Tyskland","Spanien","Frankrike","Italien"], c:0 },
+  { q:"Vem vann EM 2021?", a:["Italien","England","Frankrike","Portugal"], c:0 },
+  { q:"Vilket land arrangerade EM 2016?", a:["Frankrike","Tyskland","Spanien","Italien"], c:0 },
+  { q:"Vem gjorde segermålet i EM-finalen 2016?", a:["Eder","Ronaldo","Griezmann","Payet"], c:0 },
+  { q:"Vilket lag vann EM 2004?", a:["Grekland","Portugal","Frankrike","Italien"], c:0 },
+  { q:"Vem har gjort flest EM-mål?", a:["Cristiano Ronaldo","Platini","Müller","Shearer"], c:0 },
+  { q:"Vilket land arrangerade EM 1992?", a:["Sverige","Danmark","Tyskland","Frankrike"], c:0 },
+  { q:"Vem vann EM 1992?", a:["Danmark","Tyskland","Nederländerna","Italien"], c:0 },
+  { q:"Vilket land vann EM 2008?", a:["Spanien","Tyskland","Italien","Frankrike"], c:0 },
+  { q:"Vem gjorde mål i EM-finalen 2008?", a:["Fernando Torres","Villa","Xavi","Iniesta"], c:0 },
+  { q:"Vilket lag förlorade EM-finalen 2021?", a:["England","Spanien","Frankrike","Tyskland"], c:0 },
+  { q:"När infördes 24 lag i EM?", a:["2016","2012","2008","2020"], c:0 },
+  { q:"Vilket land vann EM 1984?", a:["Frankrike","Tyskland","Spanien","Italien"], c:0 },
+  { q:"Vem dominerade EM 1984?", a:["Platini","Zidane","Henry","Cantona"], c:0 },
+  { q:"Vilket land vann EM 1988?", a:["Nederländerna","Tyskland","Italien","Frankrike"], c:0 },
+  { q:"Vem gjorde volleymålet i finalen 1988?", a:["Van Basten","Gullit","Bergkamp","Rijkaard"], c:0 },
+  { q:"Var spelades EM-finalen 2021?", a:["London","Rom","Berlin","Paris"], c:0 },
+  { q:"Vilket land vann första EM 1960?", a:["Sovjetunionen","Spanien","Frankrike","Italien"], c:0 },
+  { q:"Vilket land vann EM 1964?", a:["Spanien","Italien","Tyskland","Frankrike"], c:0 },
+  { q:"Vilket land vann EM 1968?", a:["Italien","England","Tyskland","Frankrike"], c:0 }
+ ]
 
 };
 
@@ -409,8 +436,9 @@ function next(){
 async function finish(){
   document.getElementById("quiz").style.display="none";
   document.getElementById("result").style.display="block";
-  document.getElementById("scoreText").innerText=
-    `${user}, du fick ${score} poäng`;
+let percent = Math.round((finalScore / quiz.length) * 100);
+  document.getElementById('scoreText').innerText =
+  `${user}, du fick ${finalScore} poäng (${percent} % rätt).`;
 
 
   const ref=db.collection("players").doc(user);
