@@ -95,7 +95,29 @@ input {
     padding: 14px;
   }
 
+@media (max-width: 600px) {
+
+  button {
+    min-height: 56px;        /* Googles rekommenderade touch-yta */
+    font-size: 18px;
+    margin: 12px 0;
+  }
+
+  .box {
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  #question {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 18px;
+  }
+
 }
+
 
 </style>
 </head>
@@ -389,6 +411,7 @@ async function finish(){
   document.getElementById("result").style.display="block";
   document.getElementById("scoreText").innerText=
     `${user}, du fick ${score} poäng`;
+
 
   const ref=db.collection("players").doc(user);
   const snap=await ref.get();
