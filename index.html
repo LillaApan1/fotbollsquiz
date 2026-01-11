@@ -383,47 +383,61 @@ document.getElementById("startBtn").onclick = () => {
 /* ================= QUIZ ================= */
 
 function startQuiz(type){
-  quiz=[...quizzes[type]].sort(()=>Math.random()-0.5);
-  current=0;
-  score=0;
-  document.getElementById("menu").style.display="none";
-  document.getElementById("quiz").style.display="block";
+  quiz = [...quizzes[type]].sort(() => Math.random() - 0.5);
+  current = 0;
+  score = 0;
+
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("quiz").style.display = "block";
+
   showQuestion();
 }
 
 function showQuestion(){
   clearInterval(timer);
-  timeLeft=10;
+  timeLeft = 10;
 
-  const q=quiz[current];
-  document.getElementById("question").innerText=q.q;
-  document.getElementById("progress").innerText=
+  const q = quiz[current];
+  document.getElementById("question").innerText = q.q;
+  document.getElementById("progress").innerText =
     `Fråga ${current+1} av ${quiz.length} ⏱️ ${timeLeft}s`;
 
-  const answers=document.getElementById("answers");
-  answers.innerHTML="";
+  const answers = document.getElementById("answers");
+  answers.innerHTML = "";
 
-  q.a.forEach((text,i)=>{
-    const btn=document.createElement("button");
-    btn.innerText=text;
-    btn.onclick=()=>answer(i);
+  const shuffledAnswers = q.a.map((text, index) => ({
+    text,
+    isCorrect: index === q.c
+  })).sort(() => Math.random() - 0.5);
+
+  shuffledAnswers.forEach(ans => {
+    const btn = document.createElement("button");
+    btn.innerText = ans.text;
+    btn.onclick = () => answer(ans.isCorrect);
     answers.appendChild(btn);
   });
 
-  timer=setInterval(()=>{
+  timer = setInterval(() => {
     timeLeft--;
-    document.getElementById("progress").innerText=
+    document.getElementById("progress").innerText =
       `Fråga ${current+1} av ${quiz.length} ⏱️ ${timeLeft}s`;
-    if(timeLeft<=0){
+    if (timeLeft <= 0) {
       clearInterval(timer);
       next();
     }
-  },1000);
+  }, 1000);
 }
 
-function answer(i){
-  if(i===quiz[current].c) score++;
-  next();
+function answer(isCorrect){
+  if(isCorrect){
+    score++;
+  }
+  current++;
+  if(current < quiz.length){
+    showQuestion();
+  } else {
+    finish();
+  }
 }
 
 function next(){
