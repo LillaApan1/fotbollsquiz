@@ -1,3 +1,9 @@
+self.addEventListener("message", event => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("install", e => {
   e.waitUntil(
     caches.open("quiz-cache").then(cache =>
@@ -8,6 +14,11 @@ self.addEventListener("install", e => {
       ])
     )
   );
+});
+
+/* ✅ LÄGG TILL DETTA BLOCK – EXAKT HÄR */
+self.addEventListener("activate", event => {
+  event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener("fetch", e => {
