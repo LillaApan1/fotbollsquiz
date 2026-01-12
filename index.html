@@ -195,26 +195,27 @@ const db = firebase.firestore();
 
 const quizzes = {
 pl: [
-{q:"Vilket lag vann Premier League 2015/16?",a:["Chelsea","Leicester","Arsenal"],c:1},
-{q:"Flest mål under en PL-säsong?",a:["Salah","Haaland","Suárez"],c:1},
-{q:"Vilket lag har flest PL-titlar?",a:["Man United","Chelsea","Man City"],c:0},
-{q:"Vem gjorde målet som säkrade Man Citys titel 2012?",a:["Agüero","Silva","Touré"],c:0},
-{q:"Vilket lag åkte ur PL 2007/08 trots 40 poäng?",a:["Birmingham","Reading","Derby"],c:1},
-{q:"🔥 Första utländska spelaren som blev PL-skyttekung?",a:["Cantona","Henry","Bergkamp"],c:0},
-{q:"🔥 Vilket lag hade 'Invincibles'?",a:["Chelsea","Arsenal","Man United"],c:1},
-{q:"🔥 Rekord för flest assist på en säsong?",a:["De Bruyne","Henry","Özil"],c:0},
-{q:"🔥 Första laget som vann PL utan att spela i Europa?",a:["Blackburn","Leicester","Chelsea"],c:0},
-{q:"🔥 Vilken tränare vann flest matcher i PL-historien?",a:["Ferguson","Guardiola","Wenger"],c:0},
-{q:"Vilket lag spelar på Anfield?",a:["Everton","Liverpool","Leeds"],c:1},
-{q:"Vilken klubb kallades 'The Invincibles'?",a:["Arsenal","Chelsea","City"],c:0},
-{q:"Vilket år startade Premier League?",a:["1992","1988","1995"],c:0},
-{q:"Vem har flest röda kort i PL?",a:["Vieira","Duunne","Keane"],c:1},
-{q:"Vilket lag vann PL 2020?",a:["Liverpool","City","Chelsea"],c:0},
-{q:"Vem är PL:s bästa målskytt genom tiderna?",a:["Shearer","Kane","Rooney"],c:0},
-{q:"Vilken klubb har smeknamnet Spurs?",a:["Arsenal","Tottenham","West Ham"],c:1},
-{q:"Vilket lag vann PL flest gånger på 90-talet?",a:["United","Arsenal","Blackburn"],c:0},
-{q:"Vilken spelare kallas 'King of assists'?",a:["Giggs","De Bruyne","Lampard"],c:0},
-{q:"Vilket lag spelar på Old Trafford?",a:["Leeds","Man United","Everton"],c:1}
+  {q:"Vilket lag vann Premier League 2015/16?",a:["Chelsea","Leicester","Arsenal","Tottenham"],c:1},
+  {q:"Flest mål under en PL-säsong?",a:["Salah","Haaland","Suárez","Kane"],c:1},
+  {q:"Vilket lag har flest PL-titlar?",a:["Man United","Chelsea","Man City","Arsenal"],c:0},
+  {q:"Vem gjorde målet som säkrade Man Citys titel 2012?",a:["Agüero","Silva","Touré","Džeko"],c:0},
+  {q:"Vilket lag åkte ur PL 2007/08 trots 40 poäng?",a:["Birmingham","Reading","Derby","Fulham"],c:1},
+  {q:"🔥 Första utländska spelaren som blev PL-skyttekung?",a:["Cantona","Henry","Bergkamp","Zola"],c:0,hard:true},
+  {q:"🔥 Vilket lag hade 'Invincibles'?",a:["Chelsea","Arsenal","Man United","Liverpool"],c:1,hard:true},
+  {q:"🔥 Rekord för flest assist på en säsong?",a:["De Bruyne","Henry","Özil","Fabregas"],c:0,hard:true},
+  {q:"🔥 Första laget som vann PL utan att spela i Europa?",a:["Blackburn","Leicester","Chelsea","Arsenal"],c:0,hard:true},
+  {q:"🔥 Vilken tränare vann flest matcher i PL-historien?",a:["Ferguson","Guardiola","Wenger","Mourinho"],c:0,hard:true},
+
+  {q:"Vilket lag spelar på Anfield?",a:["Everton","Liverpool","Leeds","Aston Villa"],c:1},
+  {q:"Vilken klubb kallades 'The Invincibles'?",a:["Arsenal","Chelsea","City","Liverpool"],c:0},
+  {q:"Vilket år startade Premier League?",a:["1992","1988","1995","1990"],c:0},
+  {q:"Vem har flest röda kort i PL?",a:["Vieira","Dunne","Keane","Terry"],c:1},
+  {q:"Vilket lag vann PL 2020?",a:["Liverpool","City","Chelsea","United"],c:0},
+  {q:"Vem är PL:s bästa målskytt genom tiderna?",a:["Shearer","Kane","Rooney","Lampard"],c:0},
+  {q:"Vilken klubb har smeknamnet Spurs?",a:["Arsenal","Tottenham","West Ham","Fulham"],c:1},
+  {q:"Vilket lag vann PL flest gånger på 90-talet?",a:["United","Arsenal","Blackburn","Chelsea"],c:0},
+  {q:"Vilken spelare kallas 'King of assists'?",a:["Giggs","De Bruyne","Lampard","Beckham"],c:0},
+  {q:"Vilket lag spelar på Old Trafford?",a:["Leeds","Man United","Everton","Newcastle"],c:1}
 ]
 ,
   vm: [
@@ -424,8 +425,11 @@ document.getElementById("startBtn").onclick = () => {
 
 /* ================= QUIZ ================= */
 
-function startQuiz(type){
-  quiz = [...quizzes[type]].sort(() => Math.random() - 0.5);
+function startQuiz(type){ 
+  quiz = [...quizzes[type]]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 20);
+
   current = 0;
   score = 0;
 
@@ -434,6 +438,7 @@ function startQuiz(type){
 
   showQuestion();
 }
+
 
 function showQuestion(){
   clearInterval(timer);
