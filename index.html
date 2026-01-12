@@ -120,6 +120,31 @@ input {
 
 <body>
 
+<div id="updateBanner" style="
+  display:none;
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#22c55e;
+  color:#000;
+  padding:12px;
+  text-align:center;
+  z-index:9999;
+">
+  En ny version finns!
+  <button onclick="updateApp()" style="
+    margin-left:10px;
+    padding:6px 12px;
+    border:none;
+    border-radius:6px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+    Uppdatera
+  </button>
+</div>
+
 <div id="login" class="box">
   <h2>Skriv ditt namn</h2>
   <input id="username" placeholder="Ditt namn">
@@ -183,7 +208,7 @@ pl: [
 {q:"Vilket lag spelar på Anfield?",a:["Everton","Liverpool","Leeds"],c:1},
 {q:"Vilken klubb kallades 'The Invincibles'?",a:["Arsenal","Chelsea","City"],c:0},
 {q:"Vilket år startade Premier League?",a:["1992","1988","1995"],c:0},
-{q:"Vem har flest röda kort i PL?",a:["Vieira","Dunne","Keane"],c:1},
+{q:"Vem har flest röda kort i PL?",a:["Vieira","Duunne","Keane"],c:1},
 {q:"Vilket lag vann PL 2020?",a:["Liverpool","City","Chelsea"],c:0},
 {q:"Vem är PL:s bästa målskytt genom tiderna?",a:["Shearer","Kane","Rooney"],c:0},
 {q:"Vilken klubb har smeknamnet Spurs?",a:["Arsenal","Tottenham","West Ham"],c:1},
@@ -506,6 +531,41 @@ function backToMenu() {
   document.getElementById('result').style.display = 'none';
   document.getElementById('menu').style.display = 'block';
 }
+
+let newWorker;
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    window.location.reload();
+  });
+
+  navigator.serviceWorker.ready.then(reg => {
+    if (reg.waiting) {
+      showUpdate();
+      newWorker = reg.waiting;
+    }
+
+    reg.addEventListener("updatefound", () => {
+      newWorker = reg.installing;
+      newWorker.addEventListener("statechange", () => {
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+          showUpdate();
+        }
+      });
+    });
+  });
+}
+
+function showUpdate() {
+  document.getElementById("updateBanner").style.display = "block";
+}
+
+function updateApp() {
+  if (newWorker) {
+    newWorker.postMessage({ type: "SKIP_WAITING" });
+  }
+}
+
 
 </script>
 <div id="updateBanner" style="
