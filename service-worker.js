@@ -1,12 +1,17 @@
-const CACHE_NAME = "quiz-cache-v4"; // ⬅️ ÖKA VERSIONEN VID VARJE ÄNDRING
+// 🔥 Automatisk versionshantering – ny version vid varje deploy
+const CACHE_NAME = "quiz-cache-" + Date.now();
 
+// 📩 Ta emot meddelande från appen om att hoppa över vänteläge
 self.addEventListener("message", event => {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });
 
+// 📦 Installera ny service worker och cacha grundfiler
 self.addEventListener("install", event => {
+  self.skipWaiting();
+
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
       cache.addAll([
@@ -18,6 +23,7 @@ self.addEventListener("install", event => {
   );
 });
 
+// ♻️ Aktivera ny version och rensa gamla cache-filer
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -26,24 +32,18 @@ self.addEventListener("activate", event => {
           .filter(key => key !== CACHE_NAME)
           .map(key => caches.delete(key))
       )
-    ).then(() => self.clients.claim())
+    )
   );
+
+  self.clients.claim();
 });
 
+// 🌐 Cache-first-strategi (snabb app, fallback till nätet)
 self.addEventListener("fetch", event => {
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        // Cachea endast GET-requests
-        if (event.request.method === "GET") {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        return response;
-      })
-      .catch(() => caches.match(event.request))
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
 
