@@ -1,4 +1,4 @@
-const CACHE_NAME = "quiz-cache-v3";
+const CACHE_NAME = "quiz-cache-v4"; // ⬅️ ÖKA VERSIONEN VID VARJE ÄNDRING
 
 self.addEventListener("message", event => {
   if (event.data && event.data.type === "SKIP_WAITING") {
@@ -7,7 +7,6 @@ self.addEventListener("message", event => {
 });
 
 self.addEventListener("install", event => {
-  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
       cache.addAll([
@@ -27,15 +26,24 @@ self.addEventListener("activate", event => {
           .filter(key => key !== CACHE_NAME)
           .map(key => caches.delete(key))
       )
-    )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .then(response => {
+        // Cachea endast GET-requests
+        if (event.request.method === "GET") {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
+
