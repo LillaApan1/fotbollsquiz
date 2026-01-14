@@ -116,6 +116,12 @@ input {
 
 }
 
+#login input,
+#login button {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 </style>
 </head>
 
@@ -146,7 +152,17 @@ input {
   </button>
 </div>
 
-<div id="login" class="box">
+<div id="welcome" class="box">
+  <h1>Välkommen till Football Quiz ⚽</h1>
+  <p>
+    Testa dina kunskaper om ligor, mästerskap och legendariska ögonblick.
+    Varje quiz är unikt – vågar du utmana dig själv?
+  </p>
+  <button id="enterBtn">Börja quiza!</button>
+</div>
+
+
+<div id="login" class="box" style="display:none;">
   <h2>Skriv ditt namn</h2>
   <input id="username" placeholder="Ditt namn">
   <button id="startBtn">Fortsätt</button>
@@ -1162,6 +1178,12 @@ document.getElementById("startBtn").onclick = () => {
   document.getElementById("login").style.display="none";
   document.getElementById("menu").style.display="block";
 };
+
+document.getElementById("enterBtn").onclick = () => {
+  document.getElementById("welcome").style.display = "none";
+  document.getElementById("login").style.display = "block";
+};
+
 
 /* ================= QUIZ ================= */
 
