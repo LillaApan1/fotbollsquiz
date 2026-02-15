@@ -122,6 +122,15 @@ input {
   box-sizing: border-box;
 }
 
+#resultStats {
+  margin: 12px 0 18px 0;
+  padding: 12px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
 </style>
 </head>
 
@@ -190,6 +199,7 @@ input {
 
 <div id="result" class="box" style="display:none;">
   <h2 id="scoreText"></h2>
+<div id="resultStats"></div>
   <h3>🏆 Topp 3 i världen</h3>
   <ol id="top3"></ol>
   <p id="myRank"></p>
@@ -197,6 +207,13 @@ input {
 </div>
 
 <script>
+// ================= PLAYER STATS =================
+let stats = JSON.parse(localStorage.getItem("quizStats")) || {
+  totalScore: 0,
+  totalGames: 0,
+  highScores: {}
+};
+
 /* ================= FIREBASE ================= */
 
 const firebaseConfig = {
@@ -1168,6 +1185,8 @@ let current=0;
 let score=0;
 let timeLeft=10;
 let timer=null;
+let currentQuiz = "";
+
 
 /* ================= LOGIN ================= */
 
@@ -1188,9 +1207,12 @@ document.getElementById("enterBtn").onclick = () => {
 /* ================= QUIZ ================= */
 
 function startQuiz(type){ 
+  currentQuiz = type; 
+
   quiz = [...quizzes[type]]
     .sort(() => Math.random() - 0.5)
     .slice(0, 20);
+
 
   current = 0;
   score = 0;
@@ -1254,14 +1276,51 @@ function next(){
   current<quiz.length ? showQuestion() : finish();
 }
 
+/* ================= PLAYER STATS ================= */
+
+function saveStats(score, total) {
+
+  let stats = JSON.parse(localStorage.getItem("quizStats") || "{}");
+
+  if (!stats[currentQuiz]) {
+    stats[currentQuiz] = {
+      highScore: 0,
+      totalPoints: 0,
+      games: 0
+    };
+  }
+
+  let cat = stats[currentQuiz];
+
+  if (score > cat.highScore) {
+    cat.highScore = score;
+  }
+
+  cat.totalPoints += score;
+  cat.games += 1;
+
+  localStorage.setItem("quizStats", JSON.stringify(stats));
+
+  return {
+    highScore: cat.highScore,
+    average: (cat.totalPoints / cat.games).toFixed(1)
+  };
+}
+
+
 /* ================= RESULT ================= */
 
 async function finish(){
+  const stats = saveStats(score, quiz.length);
   document.getElementById("quiz").style.display="none";
   document.getElementById("result").style.display="block";
 let percent = Math.round((score / quiz.length) * 100);
   document.getElementById('scoreText').innerText =
   `${user}, du fick ${score} poäng (${percent} % rätt).`;
+document.getElementById("resultStats").innerHTML =
+  `<b>Din statistik</b><br>
+   🏆 High Score: ${stats.highScore}<br>
+   📊 Snittpoäng: ${stats.average}`;
 
 
   const ref=db.collection("players").doc(user);
