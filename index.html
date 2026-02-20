@@ -182,12 +182,45 @@ input {
   width: 0%;
   background: linear-gradient(90deg, #2a5298, #1e3c72);
   transition: width 0.3s ease;
+
+  box-shadow: 0 0 8px rgba(42, 82, 152, 0.6);
 }
 
-#progressText {
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 12px;
+#answers button {
+  padding: 16px;
+  margin-bottom: 14px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 16px;
+
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.15);
+
+  backdrop-filter: blur(4px);
+  transition: all 0.25s ease;
+}
+
+#answers button:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+#answers button:active {
+  transform: scale(0.97);
+}
+
+.fade-out {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.25s ease;
+}
+
+.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.25s ease;
 }
 
 </style>
@@ -1288,8 +1321,11 @@ function startQuiz(type){
   showQuestion();
 }
 
-
 function showQuestion(){
+const quizBox = document.getElementById("quiz");
+quizBox.classList.remove("fade-in");
+quizBox.classList.add("fade-out");
+
   clearInterval(timer);
   timeLeft = 10;
 
@@ -1297,8 +1333,6 @@ function showQuestion(){
   document.getElementById("question").innerText = q.q;
   let progressPercent = ((current + 1) / quiz.length) * 100;
   document.getElementById("progressBar").style.width = progressPercent + "%";
-  document.getElementById("progressText").innerText =
-    "Fråga " + (current + 1) + " av " + quiz.length;
   document.getElementById("progress").innerText =
     `Fråga ${current+1} av ${quiz.length}⏱️ ${timeLeft}s`;
 
@@ -1326,6 +1360,11 @@ function showQuestion(){
       next();
     }
   }, 1000);
+setTimeout(() => {
+  quizBox.classList.remove("fade-out");
+  quizBox.classList.add("fade-in");
+}, 50);
+
 }
 
 function answer(isCorrect){
