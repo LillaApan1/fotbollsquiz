@@ -12,6 +12,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js").then(reg => {
 
@@ -19,17 +20,12 @@ if ("serviceWorker" in navigator) {
       const newWorker = reg.installing;
 
       newWorker.addEventListener("statechange", () => {
-        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-          document.getElementById("updateBanner").style.display = "block";
+        if (newWorker.state === "activated") {
+          window.location.reload();
         }
       });
     });
 
-    document.getElementById("updateBtn").onclick = () => {
-      if (reg.waiting) {
-        reg.waiting.postMessage({ type: "SKIP_WAITING" });
-      }
-    };
   });
 }
 
@@ -172,6 +168,28 @@ input {
   animation: medalPop 0.5s ease-out;
 }
 
+#progressContainer {
+  width: 100%;
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 8px 0 6px 0;
+}
+
+#progressBar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #2a5298, #1e3c72);
+  transition: width 0.3s ease;
+}
+
+#progressText {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
 </style>
 </head>
 
@@ -234,6 +252,10 @@ input {
 
 <div id="quiz" class="box" style="display:none;">
   <h3 id="progress"></h3>
+ <div id="progressContainer">
+    <div id="progressBar"></div>
+  </div>
+  <div id="progressText"></div>
   <h2 id="question"></h2>
   <div id="answers"></div>
 </div>
@@ -1273,6 +1295,10 @@ function showQuestion(){
 
   const q = quiz[current];
   document.getElementById("question").innerText = q.q;
+  let progressPercent = ((current + 1) / quiz.length) * 100;
+  document.getElementById("progressBar").style.width = progressPercent + "%";
+  document.getElementById("progressText").innerText =
+    "Fråga " + (current + 1) + " av " + quiz.length;
   document.getElementById("progress").innerText =
     `Fråga ${current+1} av ${quiz.length}⏱️ ${timeLeft}s`;
 

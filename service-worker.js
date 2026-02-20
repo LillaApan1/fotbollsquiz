@@ -1,5 +1,5 @@
 // 🔥 Automatisk versionshantering – ny version vid varje deploy
-const CACHE_NAME = "quiz-cache-v2";
+const CACHE_NAME = "quiz-cache-v3";
 
 // 📩 Ta emot meddelande från appen om att hoppa över vänteläge
 self.addEventListener("message", event => {
@@ -38,12 +38,28 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-// 🌐 Cache-first-strategi (snabb app, fallback till nätet)
 self.addEventListener("fetch", event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
-  );
+  if (event.request.mode === "navigate") {
+    // HTML-förfrågningar (index.html)
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, copy);
+          });
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  } else {
+    // Övriga filer (css, js, bilder)
+    event.respondWith(
+      caches.match(event.request).then(response => {
+        return response || fetch(event.request);
+      })
+    );
+  }
 });
+
 
