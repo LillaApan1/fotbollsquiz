@@ -1,5 +1,5 @@
 // 🔥 Automatisk versionshantering – ny version vid varje deploy
-const CACHE_NAME = "quiz-cache-" + Date.now();
+const CACHE_NAME = "quiz-cache-v2";
 
 // 📩 Ta emot meddelande från appen om att hoppa över vänteläge
 self.addEventListener("message", event => {
