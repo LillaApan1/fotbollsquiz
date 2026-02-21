@@ -213,21 +213,23 @@ input {
 
 .fade-out {
   opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.25s ease;
+  transform: translateY(8px);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .fade-in {
   opacity: 1;
   transform: translateY(0);
-  transition: all 0.25s ease;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 #question {
   min-height: 56px;   /* plats för ca 2 rader */
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 </style>
 </head>
 
