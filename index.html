@@ -127,22 +127,29 @@ input {
   line-height: 1.5;
 }
 #scoreText {
-  font-size: 24px;
-  margin-bottom: 10px;
+  font-size: 42px;
+  font-weight: 700;
+  margin: 10px 0 5px 0;
+  letter-spacing: 1px;
+
+}
+#scorePercent {
+  font-size: 20px;
+  opacity: 0.9;
+  margin-bottom: 18px;
 }
 
-#scorePercent {
-  font-size: 18px;
-  opacity: 0.9;
-  margin-bottom: 12px;
-}
 #top3 {
-  padding-left: 20px;
-  text-align: left;
+  padding-left: 0;
+  list-style: none;
+  margin-top: 10px;
 }
 
 #top3 li {
-  margin: 6px 0;
+  background: rgba(255,255,255,0.06);
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin-bottom: 8px;
   font-size: 16px;
 }
 
@@ -230,6 +237,13 @@ input {
   justify-content: center;
 }
 
+#result {
+  background: linear-gradient(160deg, rgba(0,0,0,0.75), rgba(20,20,40,0.85));
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  backdrop-filter: blur(6px);
+}
+
 </style>
 </head>
 
@@ -312,6 +326,8 @@ input {
 </div>
 
 <script>
+let resultShown = false;
+
 // ================= PLAYER STATS =================
 let stats = JSON.parse(localStorage.getItem("quizStats")) || {
   totalScore: 0,
@@ -1426,6 +1442,8 @@ function saveStats(score, total) {
 /* ================= RESULT ================= */
 
 async function finish(){
+  if (resultShown) return;
+  resultShown = true;
   const stats = saveStats(score, quiz.length);
   document.getElementById("quiz").style.display="none";
   document.getElementById("result").style.display="block";
@@ -1449,8 +1467,22 @@ medalElement.classList.remove("medal-animate");
 void medalElement.offsetWidth; // tvingar omstart
 medalElement.classList.add("medal-animate");
 
-  document.getElementById('scoreText').innerText =
-  `${user}, du fick ${score} poäng`;
+  function animateScore(finalScore, total, userName) {
+  let currentScore = 0;
+  const scoreEl = document.getElementById("scoreText");
+
+  const interval = setInterval(() => {
+    currentScore++;
+    scoreEl.innerText =
+      `${userName}, du fick ${currentScore} poäng`;
+
+    if (currentScore >= finalScore) {
+      clearInterval(interval);
+    }
+  }, 40);
+}
+
+animateScore(score, quiz.length, user);
 document.getElementById('scorePercent').innerText =
   `${percent}% rätt`;
 let newRecordText = "";
@@ -1496,6 +1528,7 @@ function backToMenu() {
   current = 0;
   score = 0;
   quiz = [];
+  resultShown = false;
 
   document.getElementById('result').style.display = 'none';
   document.getElementById('menu').style.display = 'block';
