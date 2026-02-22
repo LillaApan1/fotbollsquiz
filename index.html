@@ -316,6 +316,112 @@ input {
   pointer-events: none;
   z-index: 9999;
 }
+
+/* ================= START SCREEN ================= */
+
+.start-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 85vh;
+  animation: fadeInStart 1.2s ease forwards;
+}
+
+.start-content {
+  text-align: center;
+  animation: slideUp 1s ease forwards;
+}
+
+.game-title {
+  font-size: 44px;
+  margin-bottom: 15px;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #FFD700, #4DA6FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+.game-subtitle {
+  opacity: 0.85;
+  margin-bottom: 35px;
+  font-size: 18px;
+}
+
+.start-btn {
+  padding: 14px 36px;
+  font-size: 18px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  background: linear-gradient(90deg, #FFD700, #FF9800);
+  color: #000;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.start-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 10px 30px rgba(255,215,0,0.4);
+}
+
+/* ===== Animationer ===== */
+
+@keyframes fadeInStart {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes titleGlow {
+  from { filter: drop-shadow(0 0 5px rgba(255,215,0,0.3)); }
+  to   { filter: drop-shadow(0 0 20px rgba(77,166,255,0.6)); }
+}
+
+/* ================= ANIMATED BACKGROUND ================= */
+
+body {
+  background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #141e30);
+  background-size: 400% 400%;
+  animation: gradientMove 18s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ================= LUXURY FLOATING LIGHTS ================= */
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(77,166,255,0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(255,215,0,0.06) 0%, transparent 40%);
+  animation: floatLights 30s ease-in-out infinite alternate;
+}
+
+@keyframes floatLights {
+  0% {
+    transform: translateY(0px) translateX(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px) scale(1.05);
+  }
+  100% {
+    transform: translateY(10px) translateX(-15px) scale(1.02);
+  }
+}
+
 </style>
 </head>
 
@@ -346,13 +452,14 @@ input {
   </button>
 </div>
 
-<div id="welcome" class="box">
-  <h1>Välkommen till Football Quiz ⚽</h1>
-  <p>
-    Testa dina kunskaper om ligor, mästerskap och legendariska ögonblick.
-    Varje quiz är unikt – vågar du utmana dig själv?
-  </p>
-  <button id="enterBtn">Börja quiza!</button>
+<div id="welcome" class="box start-screen">
+  <div class="start-content">
+    <h1 class="game-title">⚽ The Football Quiz</h1>
+    <p class="game-subtitle">
+      Bevisa att du är en riktig fotbollsexpert
+    </p>
+    <button id="enterBtn" class="start-btn">Starta</button>
+  </div>
 </div>
 
 
