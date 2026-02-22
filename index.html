@@ -264,6 +264,58 @@ input {
   box-shadow: 0 20px 60px rgba(255,0,0,0.25);
 }
 
+#medal {
+  font-size: 64px;
+  margin-bottom: 10px;
+  transition: filter 0.4s ease, transform 0.4s ease;
+}
+
+/* GULD */
+.result-gold #medal {
+  filter: drop-shadow(0 0 10px rgba(255,215,0,0.7))
+          drop-shadow(0 0 20px rgba(255,215,0,0.4));
+  animation: glowGold 1.8s ease-in-out infinite alternate;
+}
+
+/* SILVER */
+.result-silver #medal {
+  filter: drop-shadow(0 0 10px rgba(180,220,255,0.7))
+          drop-shadow(0 0 20px rgba(120,180,255,0.4));
+  animation: glowSilver 1.8s ease-in-out infinite alternate;
+}
+
+/* BRONS */
+.result-bronze #medal {
+  filter: drop-shadow(0 0 10px rgba(255,140,0,0.6))
+          drop-shadow(0 0 20px rgba(255,100,0,0.3));
+  animation: glowBronze 1.8s ease-in-out infinite alternate;
+}
+
+/* Animationer */
+@keyframes glowGold {
+  from { transform: scale(1); }
+  to   { transform: scale(1.08); }
+}
+
+@keyframes glowSilver {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+
+@keyframes glowBronze {
+  from { transform: scale(1); }
+  to   { transform: scale(1.05); }
+}
+
+#confettiCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
 </style>
 </head>
 
@@ -1529,6 +1581,9 @@ let newRecordText = "";
 
 if (score === stats.highScore && stats.average != score) {
   newRecordText = "<br>🔥 Nytt personligt rekord!";
+  setTimeout(() => {
+    launchConfetti();
+  }, 500);
 }
 
 document.getElementById("resultStats").innerHTML =
@@ -1605,6 +1660,55 @@ function updateApp() {
   window.location.reload();
 }
 
+function launchConfetti() {
+  const canvas = document.getElementById("confettiCanvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const pieces = [];
+  const colors = ["#FFD700", "#FF4D6D", "#4DA6FF", "#4CAF50", "#FF9800"];
+
+  for (let i = 0; i < 150; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      size: Math.random() * 8 + 4,
+      speed: Math.random() * 3 + 2,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotation: Math.random() * 360
+    });
+  }
+
+  let animation;
+
+  function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    pieces.forEach(p => {
+      p.y += p.speed;
+      p.rotation += 5;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+      ctx.restore();
+    });
+
+    if (pieces.some(p => p.y < canvas.height)) {
+      animation = requestAnimationFrame(update);
+    } else {
+      cancelAnimationFrame(animation);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  update();
+}
+
 </script>
 <div id="updateBanner" style="
   display:none;
@@ -1620,5 +1724,6 @@ function updateApp() {
   Ny version tillgänglig 🔄
   <button onclick="updateApp()" style="margin-left:10px;">Uppdatera</button>
 </div>
+<canvas id="confettiCanvas"></canvas>
 </body>
 </html>
