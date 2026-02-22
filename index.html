@@ -244,6 +244,26 @@ input {
   backdrop-filter: blur(6px);
 }
 
+.box.result-gold {
+  background: linear-gradient(160deg, #2b2100, #1a1400);
+  box-shadow: 0 20px 60px rgba(255,215,0,0.35);
+}
+
+.box.result-silver {
+  background: linear-gradient(160deg, #001a2e, #000f1c);
+  box-shadow: 0 20px 60px rgba(77,166,255,0.35);
+}
+
+.box.result-bronze {
+  background: linear-gradient(160deg, #2a1400, #160b00);
+  box-shadow: 0 20px 60px rgba(255,140,0,0.25);
+}
+
+.box.result-low {
+  background: linear-gradient(160deg, #2a0000, #140000);
+  box-shadow: 0 20px 60px rgba(255,0,0,0.25);
+}
+
 </style>
 </head>
 
@@ -1483,6 +1503,26 @@ medalElement.classList.add("medal-animate");
 }
 
 animateScore(score, quiz.length, user);
+const scoreEl = document.getElementById("scoreText");
+scoreEl.classList.remove("score-gold","score-silver","score-bronze","score-low");
+const resultBox = document.getElementById("result");
+resultBox.classList.remove(
+  "result-gold",
+  "result-silver",
+  "result-bronze",
+  "result-low"
+);
+
+if (percent >= 80) {
+  resultBox.classList.add("result-gold");
+} else if (percent >= 60) {
+  resultBox.classList.add("result-silver");
+} else if (percent >= 40) {
+  resultBox.classList.add("result-bronze");
+} else {
+  resultBox.classList.add("result-low");
+}
+
 document.getElementById('scorePercent').innerText =
   `${percent}% rätt`;
 let newRecordText = "";
