@@ -41,6 +41,9 @@ body {
 }
 
 .box {
+  position: relative;
+  z-index: 2;
+
   max-width:500px;
   margin:50px auto;
   background:rgba(0,0,0,0.6);
@@ -492,10 +495,129 @@ body::after {
   100% { opacity: 0; transform: scale(0.95); }
 }
 
+/* ================= PREMIUM MENU BUTTONS ================= */
+
+.menu-btn {
+  position: relative;
+  width: 100%;
+  padding: 16px;
+  margin: 10px 0;
+
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+
+  color: white;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+
+  background: linear-gradient(145deg, #0f172a, #1e293b);
+  backdrop-filter: blur(6px);
+
+  cursor: pointer;
+  overflow: hidden;
+
+  transition: all 0.35s ease;
+}
+
+/* Hover premium-effekt */
+.menu-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+
+.menu-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 60%;
+
+  opacity: 0.08;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.menu-btn:hover::before {
+  opacity: 0.18;
+  transform: scale(1.05);
+}
+
+/* ================= LIGA LOGOS ================= */
+
+.premier-league::before {
+  background-image: url("images/pl.svg");
+}
+
+.world-cup::before {
+  background-image: url("images/vm.svg");
+}
+
+.allsvenskan::before {
+  background-image: url("images/as.svg");
+}
+
+.serie-a::before {
+  background-image: url("images/sa.svg");
+}
+
+.la-liga::before {
+  background-image: url("images/ll.svg");
+}
+
+.bundesliga::before {
+  background-image: url("images/bl.svg");
+}
+
+.ligue-1::before {
+  background-image: url("images/l1.svg");
+}
+
+.champions-league::before {
+  background-image: url("images/cl.svg");
+}
+
+.euro::before {
+  background-image: url("images/em.svg");
+}
+
+
+/* ================= STADIUM LIGHTS ================= */
+
+.stadium-lights {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+
+  background:
+    radial-gradient(circle at 20% -10%, rgba(255,255,255,0.18), transparent 45%),
+    radial-gradient(circle at 80% -10%, rgba(255,255,255,0.15), transparent 50%);
+
+  mix-blend-mode: screen;
+  opacity: 0.6;
+
+  animation: stadiumMove 8s ease-in-out infinite alternate;
+}
+
+@keyframes stadiumMove {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(20px);
+  }
+}
+
 </style>
 </head>
 
 <body>
+
+<div class="stadium-lights"></div>
 
 <div id="updateBanner" style="
   display:none;
@@ -524,7 +646,7 @@ body::after {
 
 <div id="welcome" class="box start-screen show">
   <div class="start-content">
-    <h1 class="game-title">⚽ You Know Ball?</h1>
+    <h1 class="game-title">⚽ YouKnowBall?</h1>
     <p class="game-subtitle">
       Bevisa att du är en riktig fotbollsexpert
     </p>
@@ -539,18 +661,44 @@ body::after {
   <button id="startBtn">Fortsätt</button>
 </div>
 
-<div id="menu" class="box" style="display:none;">
+<div id="menu" class="box" style="display:none;"> 
   <h2>Välj quiz</h2>
-  <button onclick="startQuiz('pl')">Premier League</button>
-  <button onclick="startQuiz('vm')">VM</button>
-  <button onclick="startQuiz('as')">Allsvenskan</button>
-  <button onclick="startQuiz('sa')">Serie A</button>
-  <button onclick="startQuiz('ll')">La Liga</button>
-  <button onclick="startQuiz('bl')">Bundesliga</button>
-  <button onclick="startQuiz('l1')">Ligue 1</button>
-  <button onclick="startQuiz('cl')">Champions League</button>
-  <button onclick="startQuiz('em')">EM</button>
 
+  <button class="menu-btn premier-league" onclick="startQuiz('pl')">
+    Premier League
+  </button>
+
+  <button class="menu-btn world-cup" onclick="startQuiz('vm')">
+    VM
+  </button>
+
+  <button class="menu-btn allsvenskan" onclick="startQuiz('as')">
+    Allsvenskan
+  </button>
+
+  <button class="menu-btn serie-a" onclick="startQuiz('sa')">
+    Serie A
+  </button>
+
+  <button class="menu-btn la-liga" onclick="startQuiz('ll')">
+    La Liga
+  </button>
+
+  <button class="menu-btn bundesliga" onclick="startQuiz('bl')">
+    Bundesliga
+  </button>
+
+  <button class="menu-btn ligue-1" onclick="startQuiz('l1')">
+    Ligue 1
+  </button>
+
+  <button class="menu-btn champions-league" onclick="startQuiz('cl')">
+    Champions League
+  </button>
+
+  <button class="menu-btn euro" onclick="startQuiz('em')">
+    EM
+  </button>
 </div>
 
 <div id="quiz" class="box" style="display:none;">
