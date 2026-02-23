@@ -422,6 +422,42 @@ body::after {
   }
 }
 
+/* ================= FLOATING FOOTBALL ================= */
+
+body::after {
+  content: "";
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  background: url("https://upload.wikimedia.org/wikipedia/commons/d/d3/Soccerball.svg") no-repeat center;
+  background-size: contain;
+  opacity: 0.03;
+  filter: blur(2px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: floatBall 40s ease-in-out infinite alternate;
+}
+
+@keyframes floatBall {
+  0% { transform: translate(-55%, -50%) scale(1); }
+  50% { transform: translate(-45%, -52%) scale(1.05); }
+  100% { transform: translate(-50%, -48%) scale(1.02); }
+}
+
+/* ================= CINEMATIC INTRO ================= */
+
+.cinematic {
+  animation: cinematicFlash 1.2s ease forwards;
+}
+
+@keyframes cinematicFlash {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.4); }
+  100% { filter: brightness(1); }
+}
+
 </style>
 </head>
 
@@ -1499,10 +1535,14 @@ document.getElementById("startBtn").onclick = () => {
 };
 
 document.getElementById("enterBtn").onclick = () => {
-  document.getElementById("welcome").style.display = "none";
-  document.getElementById("login").style.display = "block";
-};
+  document.body.classList.add("cinematic");
 
+  setTimeout(() => {
+    document.getElementById("welcome").style.display = "none";
+    document.getElementById("login").style.display = "block";
+    document.body.classList.remove("cinematic");
+  }, 800);
+};
 
 /* ================= QUIZ ================= */
 
@@ -1815,6 +1855,13 @@ function launchConfetti() {
 
   update();
 }
+
+document.addEventListener("mousemove", (e) => {
+  const x = (e.clientX / window.innerWidth - 0.5) * 20;
+  const y = (e.clientY / window.innerHeight - 0.5) * 20;
+
+  document.body.style.backgroundPosition = `${50 + x}% ${50 + y}%`;
+});
 
 </script>
 <div id="updateBanner" style="
