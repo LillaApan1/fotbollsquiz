@@ -449,6 +449,49 @@ body::after {
   100% { filter: brightness(1); }
 }
 
+/* ================= DRAMATIC RESULT ENTRANCE ================= */
+
+.box.result-entrance {
+  animation: resultZoomIn 0.8s cubic-bezier(.17,.67,.3,1.3) forwards;
+}
+
+@keyframes resultZoomIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(30px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.05) translateY(-5px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Medal cinematic flash */
+
+@keyframes medalFlash {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.8); }
+  100% { filter: brightness(1); }
+}
+
+.medal-flash {
+  animation: medalFlash 0.6s ease;
+}
+
+/* Dramatic fade out quiz */
+
+.quiz-exit {
+  animation: quizFadeOut 0.6s ease forwards;
+}
+
+@keyframes quizFadeOut {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
 </style>
 </head>
 
@@ -1679,125 +1722,153 @@ function saveStats(score, total) {
 
 /* ================= RESULT ================= */
 
-async function finish(){
+async function finish() {
   if (resultShown) return;
   resultShown = true;
+
   const stats = saveStats(score, quiz.length);
+
   const quizBox = document.getElementById("quiz");
-quizBox.style.display = "none";
-quizBox.classList.remove("show");
+  const resultScreen = document.getElementById("result");
 
-const resultBox = document.getElementById("result");
-resultBox.style.display = "block";
+  /* ================= EXIT ANIMATION ================= */
 
-setTimeout(() => {
-  resultBox.classList.add("show");
-}, 10);
-let percent = Math.round((score / quiz.length) * 100);
-let medal = "";
+  quizBox.classList.add("quiz-exit");
 
-if (score >= 16) {
-  medal = "🥇";
-} else if (score >= 10) {
-  medal = "🥈";
-} else {
-  medal = "🥉";
-}
-
-const medalElement = document.getElementById("medal");
-
-medalElement.innerText = medal;
-
-// Starta animation
-medalElement.classList.remove("medal-animate");
-void medalElement.offsetWidth; // tvingar omstart
-medalElement.classList.add("medal-animate");
-
-  function animateScore(finalScore, total, userName) {
-  let currentScore = 0;
-  const scoreEl = document.getElementById("scoreText");
-
-  const interval = setInterval(() => {
-    currentScore++;
-    scoreEl.innerText =
-      `${userName}, du fick ${currentScore} poäng`;
-
-    if (currentScore >= finalScore) {
-      clearInterval(interval);
-    }
-  }, 40);
-}
-
-animateScore(score, quiz.length, user);
-const scoreEl = document.getElementById("scoreText");
-scoreEl.classList.remove("score-gold","score-silver","score-bronze","score-low");
-const resultScreen = document.getElementById("result");
-resultScreen.style.display = "block";
-
-setTimeout(() => {
-  resultScreen.classList.add("show");
-}, 10);
-resultBox.classList.remove(
-  "result-gold",
-  "result-silver",
-  "result-bronze",
-  "result-low"
-);
-
-if (percent >= 80) {
-  resultBox.classList.add("result-gold");
-} else if (percent >= 60) {
-  resultBox.classList.add("result-silver");
-} else if (percent >= 40) {
-  resultBox.classList.add("result-bronze");
-} else {
-  resultBox.classList.add("result-low");
-}
-
-document.getElementById('scorePercent').innerText =
-  `${percent}% rätt`;
-let newRecordText = "";
-
-if (score === stats.highScore && stats.average != score) {
-  newRecordText = "<br>🔥 Nytt personligt rekord!";
   setTimeout(() => {
-    launchConfetti();
-  }, 500);
-}
+    quizBox.style.display = "none";
+    quizBox.classList.remove("quiz-exit");
+    quizBox.classList.remove("show");
 
-document.getElementById("resultStats").innerHTML =
-  `<b>Din statistik</b><br>
-   🏆 High Score: ${stats.highScore}<br>
-   📊 Snittpoäng: ${stats.average}
-   ${newRecordText}`;
+    resultScreen.style.display = "block";
+    resultScreen.classList.remove("result-entrance");
+    void resultScreen.offsetWidth;
+    resultScreen.classList.add("result-entrance");
+    resultScreen.classList.add("show");
+  }, 600);
 
+  /* ================= BASIC RESULT DATA ================= */
 
-  const ref=db.collection("players").doc(user);
-  const snap=await ref.get();
-  let total=score;
-  if(snap.exists) total+=snap.data().points;
-  await ref.set({points:total});
+  let percent = Math.round((score / quiz.length) * 100);
+  let medal = "";
 
-  const list=await db.collection("players")
-    .orderBy("points","desc").get();
+  if (score >= 16) {
+    medal = "🥇";
+  } else if (score >= 10) {
+    medal = "🥈";
+  } else {
+    medal = "🥉";
+  }
 
-  let rank=0;
-  const top3=document.getElementById("top3");
-  top3.innerHTML="";
+  const medalElement = document.getElementById("medal");
+  medalElement.innerText = medal;
 
-  list.forEach(d=>{
+  /* Medal cinematic flash */
+  document.body.classList.add("cinematic");
+  setTimeout(() => {
+    document.body.classList.remove("cinematic");
+    medalElement.classList.add("medal-flash");
+  }, 300);
+
+  /* Medal animation reset */
+  medalElement.classList.remove("medal-animate");
+  void medalElement.offsetWidth;
+  medalElement.classList.add("medal-animate");
+
+  /* ================= SCORE ANIMATION ================= */
+
+  function animateScore(finalScore, userName) {
+    let currentScore = 0;
+    const scoreEl = document.getElementById("scoreText");
+
+    const interval = setInterval(() => {
+      currentScore++;
+      scoreEl.innerText =
+        `${userName}, du fick ${currentScore} poäng`;
+
+      if (currentScore >= finalScore) {
+        clearInterval(interval);
+      }
+    }, 40);
+  }
+
+  animateScore(score, user);
+
+  document.getElementById("scorePercent").innerText =
+    `${percent}% rätt`;
+
+  /* ================= RESULT COLOR ================= */
+
+  resultScreen.classList.remove(
+    "result-gold",
+    "result-silver",
+    "result-bronze",
+    "result-low"
+  );
+
+  if (percent >= 80) {
+    resultScreen.classList.add("result-gold");
+  } else if (percent >= 60) {
+    resultScreen.classList.add("result-silver");
+  } else if (percent >= 40) {
+    resultScreen.classList.add("result-bronze");
+  } else {
+    resultScreen.classList.add("result-low");
+  }
+
+  /* ================= PERSONAL STATS ================= */
+
+  let newRecordText = "";
+
+  if (score === stats.highScore && stats.average != score) {
+    newRecordText = "<br>🔥 Nytt personligt rekord!";
+    setTimeout(() => {
+      launchConfetti();
+    }, 800);
+  }
+
+  document.getElementById("resultStats").innerHTML =
+    `<b>Din statistik</b><br>
+     🏆 High Score: ${stats.highScore}<br>
+     📊 Snittpoäng: ${stats.average}
+     ${newRecordText}`;
+
+  /* ================= FIRESTORE LEADERBOARD ================= */
+
+  const ref = db.collection("players").doc(user);
+  const snap = await ref.get();
+
+  let total = score;
+  if (snap.exists) {
+    total += snap.data().points;
+  }
+
+  await ref.set({ points: total });
+
+  const list = await db.collection("players")
+    .orderBy("points", "desc")
+    .get();
+
+  let rank = 0;
+  const top3 = document.getElementById("top3");
+  top3.innerHTML = "";
+
+  list.forEach(d => {
     rank++;
-    if(rank<=3){
-      const li=document.createElement("li");
-      li.innerText=`${d.id} – ${d.data().points} poäng`;
+
+    if (rank <= 3) {
+      const li = document.createElement("li");
+      li.innerText = `${d.id} – ${d.data().points} poäng`;
       top3.appendChild(li);
     }
-    if(d.id===user){
-      document.getElementById("myRank").innerText=
+
+    if (d.id === user) {
+      document.getElementById("myRank").innerText =
         `Din plats i världen: #${rank} (${d.data().points} poäng)`;
     }
   });
 }
+
 function backToMenu() {
   current = 0;
   score = 0;
