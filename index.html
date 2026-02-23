@@ -39,23 +39,52 @@ body {
   color:white;
   text-align:center;
 }
+
 .box {
   max-width:500px;
   margin:50px auto;
   background:rgba(0,0,0,0.6);
   padding:25px;
   border-radius:15px;
+
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
+
+.box.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 button {
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  font-size:16px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
+  width: 100%;
+  padding: 16px;
+  margin: 12px 0;
+  font-size: 16px;
+  border-radius: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+
+  transition: all 0.25s ease;
 }
-button:hover { opacity:0.9; }
+
+button:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
 input {
   width:100%;
   padding:12px;
@@ -193,30 +222,6 @@ input {
   box-shadow: 0 0 8px rgba(42, 82, 152, 0.6);
 }
 
-#answers button {
-  padding: 16px;
-  margin-bottom: 14px;
-  border-radius: 16px;
-  font-weight: 600;
-  font-size: 16px;
-
-  background: rgba(255,255,255,0.08);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.15);
-
-  backdrop-filter: blur(4px);
-  transition: all 0.25s ease;
-}
-
-#answers button:hover {
-  background: rgba(255,255,255,0.15);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-}
-
-#answers button:active {
-  transform: scale(0.97);
-}
 
 .fade-out {
   opacity: 0;
@@ -396,20 +401,6 @@ body {
   100% { background-position: 0% 50%; }
 }
 
-/* ================= LUXURY FLOATING LIGHTS ================= */
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(77,166,255,0.08) 0%, transparent 40%),
-    radial-gradient(circle at 50% 90%, rgba(255,215,0,0.06) 0%, transparent 40%);
-  animation: floatLights 30s ease-in-out infinite alternate;
-}
-
 @keyframes floatLights {
   0% {
     transform: translateY(0px) translateX(0px) scale(1);
@@ -488,7 +479,7 @@ body::after {
   </button>
 </div>
 
-<div id="welcome" class="box start-screen">
+<div id="welcome" class="box start-screen show">
   <div class="start-content">
     <h1 class="game-title">⚽ WhoKnowsBall?</h1>
     <p class="game-subtitle">
@@ -1528,19 +1519,47 @@ let currentQuiz = "";
 
 document.getElementById("startBtn").onclick = () => {
   const name = document.getElementById("username").value.trim();
-  if(!name){ alert("Skriv ditt namn"); return; }
-  user=name;
-  document.getElementById("login").style.display="none";
-  document.getElementById("menu").style.display="block";
+  if(!name){ 
+    alert("Skriv ditt namn"); 
+    return; 
+  }
+
+  user = name;
+
+  const login = document.getElementById("login");
+  login.style.display = "none";
+  login.classList.remove("show");
+
+  const menu = document.getElementById("menu");
+  menu.style.display = "block";
+
+  // trigga animation
+  setTimeout(() => {
+    menu.classList.add("show");
+  }, 10);
 };
 
+
 document.getElementById("enterBtn").onclick = () => {
+
   document.body.classList.add("cinematic");
 
   setTimeout(() => {
-    document.getElementById("welcome").style.display = "none";
-    document.getElementById("login").style.display = "block";
+
+    const welcome = document.getElementById("welcome");
+    welcome.style.display = "none";
+    welcome.classList.remove("show");
+
+    const login = document.getElementById("login");
+    login.style.display = "block";
+
+    // trigga fade/slide in
+    setTimeout(() => {
+      login.classList.add("show");
+    }, 10);
+
     document.body.classList.remove("cinematic");
+
   }, 800);
 };
 
@@ -1664,8 +1683,16 @@ async function finish(){
   if (resultShown) return;
   resultShown = true;
   const stats = saveStats(score, quiz.length);
-  document.getElementById("quiz").style.display="none";
-  document.getElementById("result").style.display="block";
+  const quizBox = document.getElementById("quiz");
+quizBox.style.display = "none";
+quizBox.classList.remove("show");
+
+const resultBox = document.getElementById("result");
+resultBox.style.display = "block";
+
+setTimeout(() => {
+  resultBox.classList.add("show");
+}, 10);
 let percent = Math.round((score / quiz.length) * 100);
 let medal = "";
 
@@ -1704,7 +1731,12 @@ medalElement.classList.add("medal-animate");
 animateScore(score, quiz.length, user);
 const scoreEl = document.getElementById("scoreText");
 scoreEl.classList.remove("score-gold","score-silver","score-bronze","score-low");
-const resultBox = document.getElementById("result");
+const resultScreen = document.getElementById("result");
+resultScreen.style.display = "block";
+
+setTimeout(() => {
+  resultScreen.classList.add("show");
+}, 10);
 resultBox.classList.remove(
   "result-gold",
   "result-silver",
