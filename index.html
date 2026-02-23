@@ -537,12 +537,12 @@ body::after {
   background-repeat: no-repeat;
   background-size: 60%;
 
-  opacity: 0.08;
+  opacity: 0.15;
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .menu-btn:hover::before {
-  opacity: 0.18;
+  opacity: 0.25;
   transform: scale(1.05);
 }
 
@@ -591,25 +591,16 @@ body::after {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 
   background:
-    radial-gradient(circle at 20% -10%, rgba(255,255,255,0.18), transparent 45%),
-    radial-gradient(circle at 80% -10%, rgba(255,255,255,0.15), transparent 50%);
+    radial-gradient(circle at 10% -5%, rgba(255,255,255,0.55), transparent 55%),
+    radial-gradient(circle at 90% -5%, rgba(255,255,255,0.50), transparent 60%),
+    radial-gradient(circle at 50% -15%, rgba(255,255,255,0.25), transparent 65%);
 
-  mix-blend-mode: screen;
-  opacity: 0.6;
+  opacity: 0.9;
 
-  animation: stadiumMove 8s ease-in-out infinite alternate;
-}
-
-@keyframes stadiumMove {
-  0% {
-    transform: translateY(0px);
-  }
-  100% {
-    transform: translateY(20px);
-  }
+  animation: stadiumMove 6s ease-in-out infinite alternate;
 }
 
 </style>
