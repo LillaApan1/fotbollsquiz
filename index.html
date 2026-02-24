@@ -661,6 +661,9 @@ body::after {
 
 <script>
 let resultShown = false;
+let finishTimeout = null;
+let confettiTimeout = null;
+let medalFlashTimeout = null;
 
 // ================= PLAYER STATS =================
 let stats = JSON.parse(localStorage.getItem("quizStats")) || {
@@ -1811,16 +1814,23 @@ async function finish() {
   if (resultShown) return;
   resultShown = true;
 
+  // ✅ stoppa ev gamla timeouts (säkerhet)
+  clearTimeout(finishTimeout);
+  clearTimeout(confettiTimeout);
+  clearTimeout(medalFlashTimeout);
+
   const stats = saveStats(score, quiz.length);
 
   const quizBox = document.getElementById("quiz");
   const resultScreen = document.getElementById("result");
 
   /* ================= EXIT ANIMATION ================= */
-
   quizBox.classList.add("quiz-exit");
 
-  setTimeout(() => {
+  finishTimeout = setTimeout(() => {
+    // ✅ om användaren hann gå tillbaka till menyn: gör ingenting
+    if (!resultShown) return;
+
     quizBox.style.display = "none";
     quizBox.classList.remove("quiz-exit");
     quizBox.classList.remove("show");
@@ -1833,24 +1843,15 @@ async function finish() {
   }, 600);
 
   /* ================= BASIC RESULT DATA ================= */
-
   let percent = Math.round((score / quiz.length) * 100);
-  let medal = "";
-
-  if (score >= 16) {
-    medal = "🥇";
-  } else if (score >= 10) {
-    medal = "🥈";
-  } else {
-    medal = "🥉";
-  }
+  let medal = score >= 16 ? "🥇" : score >= 10 ? "🥈" : "🥉";
 
   const medalElement = document.getElementById("medal");
   medalElement.innerText = medal;
 
   /* Medal cinematic flash */
   document.body.classList.add("cinematic");
-  setTimeout(() => {
+  medalFlashTimeout = setTimeout(() => {
     document.body.classList.remove("cinematic");
     medalElement.classList.add("medal-flash");
   }, 300);
@@ -1861,53 +1862,37 @@ async function finish() {
   medalElement.classList.add("medal-animate");
 
   /* ================= SCORE ANIMATION ================= */
-
   function animateScore(finalScore, userName) {
     let currentScore = 0;
     const scoreEl = document.getElementById("scoreText");
 
     const interval = setInterval(() => {
       currentScore++;
-      scoreEl.innerText =
-        `${userName}, du fick ${currentScore} poäng`;
-
-      if (currentScore >= finalScore) {
-        clearInterval(interval);
-      }
+      scoreEl.innerText = `${userName}, du fick ${currentScore} poäng`;
+      if (currentScore >= finalScore) clearInterval(interval);
     }, 40);
   }
 
   animateScore(score, user);
 
-  document.getElementById("scorePercent").innerText =
-    `${percent}% rätt`;
+  document.getElementById("scorePercent").innerText = `${percent}% rätt`;
 
   /* ================= RESULT COLOR ================= */
+  resultScreen.classList.remove("result-gold", "result-silver", "result-bronze", "result-low");
 
-  resultScreen.classList.remove(
-    "result-gold",
-    "result-silver",
-    "result-bronze",
-    "result-low"
-  );
-
-  if (percent >= 80) {
-    resultScreen.classList.add("result-gold");
-  } else if (percent >= 60) {
-    resultScreen.classList.add("result-silver");
-  } else if (percent >= 40) {
-    resultScreen.classList.add("result-bronze");
-  } else {
-    resultScreen.classList.add("result-low");
-  }
+  if (percent >= 80) resultScreen.classList.add("result-gold");
+  else if (percent >= 60) resultScreen.classList.add("result-silver");
+  else if (percent >= 40) resultScreen.classList.add("result-bronze");
+  else resultScreen.classList.add("result-low");
 
   /* ================= PERSONAL STATS ================= */
-
   let newRecordText = "";
 
   if (score === stats.highScore && stats.average != score) {
     newRecordText = "<br>🔥 Nytt personligt rekord!";
-    setTimeout(() => {
+    confettiTimeout = setTimeout(() => {
+      // ✅ om användaren hann gå tillbaka till menyn: gör ingenting
+      if (!resultShown) return;
       launchConfetti();
     }, 800);
   }
@@ -1919,20 +1904,15 @@ async function finish() {
      ${newRecordText}`;
 
   /* ================= FIRESTORE LEADERBOARD ================= */
-
   const ref = db.collection("players").doc(user);
   const snap = await ref.get();
 
   let total = score;
-  if (snap.exists) {
-    total += snap.data().points;
-  }
+  if (snap.exists) total += snap.data().points;
 
   await ref.set({ points: total });
 
-  const list = await db.collection("players")
-    .orderBy("points", "desc")
-    .get();
+  const list = await db.collection("players").orderBy("points", "desc").get();
 
   let rank = 0;
   const top3 = document.getElementById("top3");
@@ -1955,13 +1935,24 @@ async function finish() {
 }
 
 function backToMenu() {
+  // ✅ stoppa timer + alla "hängande" timeouts från finish
+  clearInterval(timer);
+  clearTimeout(finishTimeout);
+  clearTimeout(confettiTimeout);
+  clearTimeout(medalFlashTimeout);
+
   current = 0;
   score = 0;
   quiz = [];
   resultShown = false;
 
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('menu').style.display = 'block';
+  const result = document.getElementById("result");
+  result.style.display = "none";
+  result.classList.remove("show", "result-entrance", "result-gold", "result-silver", "result-bronze", "result-low");
+
+  const menu = document.getElementById("menu");
+  menu.style.display = "block";
+  setTimeout(() => menu.classList.add("show"), 10);
 }
 
 let newWorker;
