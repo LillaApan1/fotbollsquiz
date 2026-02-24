@@ -40,6 +40,10 @@ body {
   text-align:center;
 }
 
+html, body {
+  min-height: 100%;
+}
+
 .box {
   position: relative;
   z-index: 2;
@@ -526,7 +530,12 @@ body::after {
 
 .stadium-lights {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;          /* fallback */
+  height: 100dvh;         /* modern mobil-lösning */
+  
   pointer-events: none;
   z-index: 1;
 
