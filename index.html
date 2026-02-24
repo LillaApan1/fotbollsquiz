@@ -499,6 +499,7 @@ body::after {
 
 .menu-btn {
   position: relative;
+  z-index: 2;                 /* Viktigt för lagerordning */
   width: 100%;
   padding: 16px;
   margin: 10px 0;
@@ -520,14 +521,7 @@ body::after {
   transition: all 0.35s ease;
 }
 
-/* Hover premium-effekt */
-.menu-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.45);
-  border: 1px solid rgba(255,255,255,0.18);
-}
-
-
+/* Själva logotyp-lagret */
 .menu-btn::before {
   content: "";
   position: absolute;
@@ -537,12 +531,29 @@ body::after {
   background-repeat: no-repeat;
   background-size: 60%;
 
-  opacity: 0.15;
+  opacity: 0.18;
+
+  z-index: 1;                 /* Ligger över bakgrund */
+  pointer-events: none;
+
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
+/* Säkerställer att texten ligger över loggan */
+.menu-btn span {
+  position: relative;
+  z-index: 3;
+}
+
+/* Hover-effekt */
+.menu-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
 .menu-btn:hover::before {
-  opacity: 0.25;
+  opacity: 0.28;
   transform: scale(1.05);
 }
 
@@ -656,39 +667,39 @@ body::after {
   <h2>Välj quiz</h2>
 
   <button class="menu-btn premier-league" onclick="startQuiz('pl')">
-    Premier League
+    <span>Premier League
   </button>
 
   <button class="menu-btn world-cup" onclick="startQuiz('vm')">
-    VM
+    <span>VM
   </button>
 
   <button class="menu-btn allsvenskan" onclick="startQuiz('as')">
-    Allsvenskan
+    <span>Allsvenskan
   </button>
 
   <button class="menu-btn serie-a" onclick="startQuiz('sa')">
-    Serie A
+    <span>Serie A
   </button>
 
   <button class="menu-btn la-liga" onclick="startQuiz('ll')">
-    La Liga
+    <span>La Liga
   </button>
 
   <button class="menu-btn bundesliga" onclick="startQuiz('bl')">
-    Bundesliga
+    <span>Bundesliga
   </button>
 
   <button class="menu-btn ligue-1" onclick="startQuiz('l1')">
-    Ligue 1
+    <span>Ligue 1
   </button>
 
   <button class="menu-btn champions-league" onclick="startQuiz('cl')">
-    Champions League
+    <span>Champions League
   </button>
 
   <button class="menu-btn euro" onclick="startQuiz('em')">
-    EM
+    <span>EM
   </button>
 </div>
 
