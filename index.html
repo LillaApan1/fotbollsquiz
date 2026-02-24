@@ -498,8 +498,6 @@ body::after {
 /* ================= PREMIUM MENU BUTTONS ================= */
 
 .menu-btn {
-  position: relative;
-  z-index: 2;                 /* Viktigt för lagerordning */
   width: 100%;
   padding: 16px;
   margin: 10px 0;
@@ -512,8 +510,12 @@ body::after {
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.08);
 
-  background: linear-gradient(145deg, #0f172a, #1e293b);
-  backdrop-filter: blur(6px);
+  background:
+    linear-gradient(145deg, #0f172a, #1e293b);  /* Basgradient */
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 60%;
 
   cursor: pointer;
   overflow: hidden;
@@ -521,78 +523,66 @@ body::after {
   transition: all 0.35s ease;
 }
 
-/* Själva logotyp-lagret */
-.menu-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 60%;
-
-  opacity: 0.18;
-
-  z-index: 1;                 /* Ligger över bakgrund */
-  pointer-events: none;
-
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-/* Säkerställer att texten ligger över loggan */
-.menu-btn span {
-  position: relative;
-  z-index: 3;
-}
-
-/* Hover-effekt */
 .menu-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 25px rgba(0,0,0,0.45);
   border: 1px solid rgba(255,255,255,0.18);
 }
 
-.menu-btn:hover::before {
-  opacity: 0.28;
-  transform: scale(1.05);
-}
-
 /* ================= LIGA LOGOS ================= */
 
-.premier-league::before {
-  background-image: url("images/pl.svg");
+.premier-league {
+  background-image:
+    linear-gradient(145deg, #0f172a, #1e293b),
+    url("images/pl.svg");
 }
 
-.world-cup::before {
-  background-image: url("images/vm.svg");
+.world-cup {
+  background-image:
+    linear-gradient(145deg, #0f172a, #1e293b),
+    url("images/vm.svg");
 }
 
-.allsvenskan::before {
-  background-image: url("images/as.svg");
+.allsvenskan {
+  background-image:
+    linear-gradient(145deg, #0f172a, #1e293b),
+    url("images/as.svg");
 }
 
-.serie-a::before {
-  background-image: url("images/sa.svg");
+.serie-a {
+  background-image:
+    linear-gradient(145deg, #0f172a, #1e293b),
+    url("images/sa.svg");
 }
 
-.la-liga::before {
-  background-image: url("images/ll.svg");
+.la-liga {
+  background-image:
+    linear-gradient(145deg, #0f172a, #1e293b),
+    url("images/ll.svg");
 }
 
-.bundesliga::before {
-  background-image: url("images/bl.svg");
+.bundesliga {
+  background-image:
+    linear-gradient(145deg, #0f172a, #1e293b),
+    url("images/bl.svg");
 }
 
-.ligue-1::before {
-  background-image: url("images/l1.svg");
+.ligue-1 {
+  background-image:
+    linear-gradient(145deg, #0f172a, #1e293b),
+    url("images/l1.svg");
 }
 
-.champions-league::before {
-  background-image: url("images/cl.svg");
+.champions-league {
+  background-image:
+    linear-gradient(145deg, #0f172a, #1e293b),
+    url("images/cl.svg");
 }
 
-.euro::before {
-  background-image: url("images/em.svg");
+.euro {
+  background-image:
+    linear-gradient(145deg, #0f172a, #1e293b),
+    url("images/em.svg");
 }
 
 
