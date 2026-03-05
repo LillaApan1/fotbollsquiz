@@ -1,6 +1,20 @@
 // 🔥 Automatisk versionshantering – ny version vid varje deploy
-const CACHE_NAME = "quiz-cache-v25";
+const CACHE_NAME = "quiz-cache-v26";
+const FILES_TO_CACHE = [
+  "./",
+  "./index.html",
+  "./manifest.json",
 
+  // Bilder / ikoner
+  "./icon-192-v2.png",
+  "./icon-512-v2.png",
+
+  // Eventuella CSS-filer (du lägger till dessa senare i steg 4)
+  // "./styles.css",
+
+  // JavaScript (kommer också senare, efter utrensning)
+  // "./main.js"
+];
 // 📩 Ta emot meddelande från appen om att hoppa över vänteläge
 self.addEventListener("message", event => {
   if (event.data && event.data.type === "SKIP_WAITING") {
@@ -13,13 +27,9 @@ self.addEventListener("install", event => {
   self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache =>
-      cache.addAll([
-        "./",
-        "./index.html",
-        "./manifest.json"
-      ])
-    )
+caches.open(CACHE_NAME).then(cache => {
+  return cache.addAll(FILES_TO_CACHE);
+});
   );
 });
 
