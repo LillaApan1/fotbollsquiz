@@ -552,6 +552,34 @@ body::after {
   animation: stadiumMove 6s ease-in-out infinite alternate;
 }
 
+#introScreen{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#0f172a;
+  z-index:9999;
+  opacity:1;
+  transition:opacity 1.5s ease;
+}
+
+#introScreen.hide{
+  opacity:0;
+  pointer-events:none;
+}
+
+#introLogo{
+  width:160px;
+  animation:introZoom 2s ease;
+}
+
+@keyframes introZoom{
+  0%{transform:scale(0.7); opacity:0;}
+  50%{transform:scale(1.05); opacity:1;}
+  100%{transform:scale(1);}
+}
+
 </style>
 </head>
 
@@ -582,6 +610,10 @@ body::after {
   ">
     Uppdatera
   </button>
+</div>
+
+<div id="introScreen">
+  <img src="icon-512-v4.png" id="introLogo">
 </div>
 
 <div id="welcome" class="box start-screen show">
@@ -2043,6 +2075,20 @@ document.addEventListener("mousemove", (e) => {
   const y = (e.clientY / window.innerHeight - 0.5) * 20;
 
   document.body.style.backgroundPosition = `${50 + x}% ${50 + y}%`;
+});
+
+window.addEventListener("load", () => {
+
+  setTimeout(() => {
+    const intro = document.getElementById("introScreen");
+    intro.classList.add("hide");
+
+    setTimeout(()=>{
+      intro.style.display="none";
+    },1500);
+
+  },1800);
+
 });
 
 </script>
