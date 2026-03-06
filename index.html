@@ -552,32 +552,84 @@ body::after {
   animation: stadiumMove 6s ease-in-out infinite alternate;
 }
 
-#introScreen{
-  position:fixed;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#0f172a;
-  z-index:9999;
-  opacity:1;
-  transition:opacity 1.5s ease;
+#introScreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #0f2027, #0f172a, #08131d);
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 1.8s ease;
 }
 
-#introScreen.hide{
-  opacity:0;
-  pointer-events:none;
+#introScreen.hide {
+  opacity: 0;
+  pointer-events: none;
 }
 
-#introLogo{
-  width:160px;
-  animation:introZoom 2s ease;
+#introContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: introFloat 2.4s ease;
 }
 
-@keyframes introZoom{
-  0%{transform:scale(0.7); opacity:0;}
-  50%{transform:scale(1.05); opacity:1;}
-  100%{transform:scale(1);}
+#introLogo {
+  width: 170px;
+  margin-bottom: 18px;
+  filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.25));
+  animation: introLogoPop 2s ease;
+}
+
+#introTitle {
+  margin: 0;
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #facc15, #93c5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 18px rgba(255,255,255,0.08);
+  opacity: 0;
+  animation: introTitleFade 1.4s ease forwards;
+  animation-delay: 0.5s;
+}
+
+@keyframes introLogoPop {
+  0% {
+    transform: scale(0.72);
+    opacity: 0;
+  }
+  45% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes introTitleFade {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes introFloat {
+  0% {
+    transform: translateY(12px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 </style>
@@ -613,7 +665,10 @@ body::after {
 </div>
 
 <div id="introScreen">
-  <img src="icon-512-v4.png" id="introLogo">
+  <div id="introContent">
+    <img src="icon-512-v4.png" id="introLogo">
+    <h1 id="introTitle">YouKnowBall</h1>
+  </div>
 </div>
 
 <div id="welcome" class="box start-screen show">
@@ -2078,17 +2133,16 @@ document.addEventListener("mousemove", (e) => {
 });
 
 window.addEventListener("load", () => {
+  const intro = document.getElementById("introScreen");
 
   setTimeout(() => {
-    const intro = document.getElementById("introScreen");
     intro.classList.add("hide");
 
-    setTimeout(()=>{
-      intro.style.display="none";
-    },1500);
+    setTimeout(() => {
+      intro.style.display = "none";
+    }, 1800);
 
-  },1800);
-
+  }, 2200);
 });
 
 </script>
