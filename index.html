@@ -1773,7 +1773,14 @@ em: [
 
 /* ================= VARIABLER ================= */
 
-let user="";
+let playerId = localStorage.getItem("playerId");
+
+if (!playerId) {
+  playerId = crypto.randomUUID();
+  localStorage.setItem("playerId", playerId);
+}
+
+let user = localStorage.getItem("displayName") || "";
 let quiz=[];
 let current=0;
 let score=0;
@@ -1792,6 +1799,7 @@ document.getElementById("startBtn").onclick = () => {
   }
 
   user = name;
+  localStorage.setItem("displayName", name);
 
   const login = document.getElementById("login");
   login.style.display = "none";
@@ -2040,13 +2048,16 @@ async function finish() {
      ${newRecordText}`;
 
   /* ================= FIRESTORE LEADERBOARD ================= */
-  const ref = db.collection("players").doc(user);
+  const ref = db.collection("players").doc(playerId);
   const snap = await ref.get();
 
   let total = score;
   if (snap.exists) total += snap.data().points;
 
-  await ref.set({ points: total });
+  await ref.set({
+  points: total,
+  displayName: user
+});
 
   const list = await db.collection("players").orderBy("points", "desc").get();
 
@@ -2057,16 +2068,17 @@ async function finish() {
   list.forEach(d => {
     rank++;
 
-    if (rank <= 3) {
-      const li = document.createElement("li");
-      li.innerText = `${d.id} – ${d.data().points} poäng`;
-      top3.appendChild(li);
-    }
+  if (rank <= 3) {
+  const li = document.createElement("li");
+  const playerName = d.data().displayName || d.id;
+  li.innerText = `${playerName} – ${d.data().points} poäng`;
+  top3.appendChild(li);
+}
 
-    if (d.id === user) {
-      document.getElementById("myRank").innerText =
-        `Din plats i världen: #${rank} (${d.data().points} poäng)`;
-    }
+   if(d.id === playerId){
+  document.getElementById("myRank").innerText =
+    `Din plats i världen: #${rank} (${d.data().points} poäng)`;
+}
   });
 }
 
