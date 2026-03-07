@@ -561,7 +561,7 @@ body::after {
   background: linear-gradient(180deg, #0f2027, #0f172a, #08131d);
   z-index: 9999;
   opacity: 1;
-  transition: opacity 1.8s ease;
+  transition: opacity 2.8s ease;
 }
 
 #introScreen.hide {
@@ -632,6 +632,47 @@ body::after {
   }
 }
 
+#introLogoWrap {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+#introLogoWrap::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -60%;
+  width: 40%;
+  height: 140%;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.08) 30%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,255,255,0.08) 70%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: skewX(-20deg);
+  animation: logoSweep 2.8s ease-in-out 0.8s 1;
+  pointer-events: none;
+}
+
+@keyframes logoSweep {
+  0% {
+    left: -60%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    left: 130%;
+    opacity: 0;
+  }
+}
+
 </style>
 </head>
 
@@ -666,8 +707,13 @@ body::after {
 
 <div id="introScreen">
   <div id="introContent">
-    <img src="icon-512-v4.png" id="introLogo">
+
+    <div id="introLogoWrap">
+      <img src="icon-512-v4.png" id="introLogo">
+    </div>
+
     <h1 id="introTitle">YouKnowBall</h1>
+
   </div>
 </div>
 
@@ -2142,7 +2188,7 @@ window.addEventListener("load", () => {
       intro.style.display = "none";
     }, 1800);
 
-  }, 2200);
+  }, 3500);
 });
 
 </script>
