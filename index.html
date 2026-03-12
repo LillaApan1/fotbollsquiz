@@ -192,6 +192,12 @@ input {
   font-size: 16px;
 }
 
+#top3 li.me {
+  background: rgba(34,197,94,0.15);
+  border: 1px solid rgba(34,197,94,0.35);
+  font-weight: 600;
+}
+
 #medal {
   font-size: 50px;
   margin-bottom: 10px;
@@ -673,6 +679,31 @@ body::after {
   }
 }
 
+/* ================= PLAYER PROFILE PANEL ================= */
+
+#profilePanel {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+
+  padding: 12px 16px;
+  margin: 15px 0 20px 0;
+
+  backdrop-filter: blur(4px);
+}
+
+#profileName {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+#profilePanel p {
+  font-size: 14px;
+  margin: 4px 0;
+  opacity: 0.9;
+}
+
 </style>
 </head>
 
@@ -737,6 +768,16 @@ body::after {
 <div id="menu" class="box" style="display:none;"> 
   <h2>Välj quiz</h2>
 
+<div id="profilePanel">
+  <h3 id="profileName"></h3>
+  <p id="profilePoints"></p>
+  <p id="profileRank"></p>
+  <p id="profileGames"></p>
+  <p id="profileBestScore"></p>
+  <p id="profileAverage"></p>
+  <p id="profileBestCategory"></p>
+</div>
+
   <button class="menu-btn premier-league" onclick="startQuiz('pl')">
     <span>Premier League
   </button>
@@ -789,9 +830,13 @@ body::after {
 <h2 id="scoreText"></h2>
 <div id="scorePercent"></div>
 <div id="resultStats"></div>
-  <h3>🏆 Topp 3 i världen</h3>
+  <h3>🏆 Topp 10 i världen</h3>
   <ol id="top3"></ol>
-  <p id="myRank"></p>
+<div id="myRankSeparator" style="display:none; margin:10px 0; opacity:0.5;">
+────────────
+</div>
+
+<p id="myRank"></p>
   <button onclick="backToMenu()">Spela ett annat quiz</button>
 </div>
 
@@ -1807,8 +1852,9 @@ document.getElementById("startBtn").onclick = () => {
 
   const menu = document.getElementById("menu");
   menu.style.display = "block";
-
-  // trigga animation
+  loadProfilePanel();
+  
+// trigga animation
   setTimeout(() => {
     menu.classList.add("show");
   }, 10);
@@ -1837,6 +1883,109 @@ document.getElementById("enterBtn").onclick = () => {
 
   }, 800);
 };
+
+const categoryNames = {
+  pl: "Premier League",
+  vm: "VM",
+  as: "Allsvenskan",
+  sa: "Serie A",
+  ll: "La Liga",
+  bl: "Bundesliga",
+  l1: "Ligue 1",
+  cl: "Champions League",
+  em: "EM"
+};
+
+async function loadProfilePanel() { 
+  const profileName = document.getElementById("profileName");
+  const profilePoints = document.getElementById("profilePoints");
+  const profileRank = document.getElementById("profileRank");
+  const profileGames = document.getElementById("profileGames");
+  const profileBestScore = document.getElementById("profileBestScore");
+  const profileAverage = document.getElementById("profileAverage");
+  const profileBestCategory = document.getElementById("profileBestCategory");
+
+  profileName.innerText = user || "Spelare";
+  profilePoints.innerText = "Totalpoäng: laddar...";
+  profileRank.innerText = "Världsranking: laddar...";
+  profileGames.innerText = "Quiz spelade: laddar...";
+  profileBestScore.innerText = "Bästa resultat: laddar...";
+  profileAverage.innerText = "Snittpoäng: laddar...";
+  profileBestCategory.innerText = "Bästa kategori: laddar...";
+
+  const ref = db.collection("players").doc(playerId);
+  const snap = await ref.get();
+
+    if (snap.exists) {
+    const data = snap.data();
+    profileName.innerText = user || data.displayName || "Spelare";
+    profilePoints.innerText = `Totalpoäng: ${data.points || 0}`;
+    profileGames.innerText = `Quiz spelade: ${data.gamesPlayed || 0}`;
+  } else {
+    profileName.innerText = user || "Spelare";
+    profilePoints.innerText = "Totalpoäng: 0";
+    profileGames.innerText = `Quiz spelade: ${data.gamesPlayed || 0}`;
+  }
+
+  const list = await db.collection("players")
+    .orderBy("points", "desc")
+    .get();
+
+  let rank = 0;
+
+  list.forEach(d => {
+    rank++;
+    if (d.id === playerId) {
+      profileRank.innerText = `Världsranking: #${rank}`;
+    }
+  });
+
+  const localStats = JSON.parse(localStorage.getItem("quizStats") || "{}");
+
+  let bestScore = 0;
+
+  Object.keys(localStats).forEach(key => {
+    if (localStats[key] && typeof localStats[key].highScore === "number") {
+      if (localStats[key].highScore > bestScore) {
+        bestScore = localStats[key].highScore;
+      }
+    }
+  });
+
+  profileBestScore.innerText = `Bästa resultat: ${bestScore}`;
+  
+  let totalPoints = 0;
+  let totalGames = 0;
+
+  Object.keys(localStats).forEach(key => {
+    if (localStats[key]) {
+      totalPoints += localStats[key].totalPoints || 0;
+      totalGames += localStats[key].games || 0;
+    }
+  });
+
+  const averageScore = totalGames > 0 ? (totalPoints / totalGames).toFixed(1) : "0.0";
+  profileAverage.innerText = `Snittpoäng: ${averageScore}`;
+
+let bestCategory = "Ingen ännu";
+let bestAverage = 0;
+
+Object.keys(localStats).forEach(key => {
+  const cat = localStats[key];
+
+  if (cat && cat.games > 0) {
+    const avg = cat.totalPoints / cat.games;
+
+    if (avg > bestAverage) {
+      bestAverage = avg;
+      bestCategory = key;
+    }
+  }
+});
+
+profileBestCategory.innerText = `Bästa kategori: ${categoryNames[bestCategory] || bestCategory}`;
+
+}
 
 /* ================= QUIZ ================= */
 
@@ -1921,6 +2070,19 @@ function next(){
 }
 
 /* ================= PLAYER STATS ================= */
+
+function getLocalGamesPlayed() {
+  const localStats = JSON.parse(localStorage.getItem("quizStats") || "{}");
+  let totalGames = 0;
+
+  Object.keys(localStats).forEach(key => {
+    if (localStats[key] && typeof localStats[key].games === "number") {
+      totalGames += localStats[key].games;
+    }
+  });
+
+  return totalGames;
+}
 
 function saveStats(score, total) {
 
@@ -2051,12 +2213,23 @@ async function finish() {
   const ref = db.collection("players").doc(playerId);
   const snap = await ref.get();
 
-  let total = score;
-  if (snap.exists) total += snap.data().points;
+let total = score;
+let gamesPlayed = 1;
+
+if (snap.exists) {
+  total += snap.data().points || 0;
+
+  if (typeof snap.data().gamesPlayed === "number") {
+    gamesPlayed = snap.data().gamesPlayed + 1;
+  } else {
+    gamesPlayed = getLocalGamesPlayed();
+  }
+}
 
   await ref.set({
-  points: total,
-  displayName: user
+    points: total,
+    displayName: user,
+    gamesPlayed: gamesPlayed
 });
 
   const list = await db.collection("players").orderBy("points", "desc").get();
@@ -2064,20 +2237,45 @@ async function finish() {
   let rank = 0;
   const top3 = document.getElementById("top3");
   top3.innerHTML = "";
-
+  
+  document.getElementById("myRankSeparator").style.display = "none";
+  document.getElementById("myRank").innerText = "";
+  
   list.forEach(d => {
     rank++;
 
-  if (rank <= 3) {
+if (rank <= 10) {
   const li = document.createElement("li");
-  const playerName = d.data().displayName || d.id;
-  li.innerText = `${playerName} – ${d.data().points} poäng`;
+  let medal = "";
+
+ if (rank === 1) medal = "🥇 ";
+  else if (rank === 2) medal = "🥈 ";
+  else if (rank === 3) medal = "🥉 ";
+
+  li.innerText = `${medal}${rank}. ${d.data().displayName || d.id} – ${d.data().points} poäng`;
+
+  if (d.id === playerId) {
+    li.classList.add("me");
+  }
+
   top3.appendChild(li);
 }
 
-   if(d.id === playerId){
-  document.getElementById("myRank").innerText =
-    `Din plats i världen: #${rank} (${d.data().points} poäng)`;
+   if (d.id === playerId) {
+
+  const myRankText =
+    `⭐ ${rank}. ${d.data().displayName || d.id} – ${d.data().points} poäng`;
+
+  document.getElementById("myRank").innerText = myRankText;
+
+  const separator = document.getElementById("myRankSeparator");
+
+  if (rank > 10) {
+    separator.style.display = "block";
+  } else {
+    separator.style.display = "none";
+  }
+
 }
   });
 }
@@ -2100,6 +2298,7 @@ function backToMenu() {
 
   const menu = document.getElementById("menu");
   menu.style.display = "block";
+  loadProfilePanel();
   setTimeout(() => menu.classList.add("show"), 10);
 }
 
