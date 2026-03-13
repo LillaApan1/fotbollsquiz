@@ -704,6 +704,33 @@ body::after {
   opacity: 0.9;
 }
 
+/* ================= DAILY CHALLENGE BUTTON ================= */
+
+button.daily-btn {
+  width: 100%;
+  padding: 16px;
+  margin: 12px 0 18px 0;
+
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+
+  border-radius: 16px;
+  cursor: pointer;
+
+  background: linear-gradient(90deg,#FFD700,#FF9800);
+  color: #000;
+
+  border: none;
+
+  transition: all 0.3s ease;
+}
+
+button.daily-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(255,215,0,0.4);
+}
+
 </style>
 </head>
 
@@ -778,7 +805,7 @@ body::after {
   <p id="profileBestCategory"></p>
 </div>
 
-  <button id="dailyBtn" onclick="startDailyChallenge()">🔥 Daily Challenge</button>
+  <button id="dailyBtn" class="daily-btn" onclick="startDailyChallenge()">🔥 Daily Challenge</button>
 
   <button class="menu-btn premier-league" onclick="startQuiz('pl')">
     <span>Premier League
@@ -839,6 +866,12 @@ body::after {
 </div>
 
 <p id="myRank"></p>
+<div id="dailyLeaderboard" style="display:none;">
+  <h3>🔥 Daily Leaderboard</h3>
+  <ol id="dailyTopList"></ol>
+  <p id="dailyMyRank"></p>
+</div>
+
   <button onclick="backToMenu()">Spela ett annat quiz</button>
 </div>
 
@@ -1895,7 +1928,8 @@ const categoryNames = {
   bl: "Bundesliga",
   l1: "Ligue 1",
   cl: "Champions League",
-  em: "EM"
+  em: "EM",
+  daily: "Daily Challenge"
 };
 
 async function loadProfilePanel() { 
@@ -2294,42 +2328,57 @@ if (snap.exists) {
   document.getElementById("myRank").innerText = "";
   
   list.forEach(d => {
-    rank++;
+  rank++;
 
-if (rank <= 10) {
-  const li = document.createElement("li");
-  let medal = "";
+  if (rank <= 10) {
+    const li = document.createElement("li");
+    let medal = "";
 
- if (rank === 1) medal = "🥇 ";
-  else if (rank === 2) medal = "🥈 ";
-  else if (rank === 3) medal = "🥉 ";
+    if (rank === 1) medal = "🥇 ";
+    else if (rank === 2) medal = "🥈 ";
+    else if (rank === 3) medal = "🥉 ";
 
-  li.innerText = `${medal}${rank}. ${d.data().displayName || d.id} – ${d.data().points} poäng`;
+    li.innerText = `${medal}${rank}. ${d.data().displayName || d.id} – ${d.data().points} poäng`;
+
+    if (d.id === playerId) {
+      li.classList.add("me");
+    }
+
+    top3.appendChild(li);
+  }
 
   if (d.id === playerId) {
-    li.classList.add("me");
-  }
 
-  top3.appendChild(li);
+    const myRankText =
+      `⭐ ${rank}. ${d.data().displayName || d.id} – ${d.data().points} poäng`;
+
+    document.getElementById("myRank").innerText = myRankText;
+
+    const separator = document.getElementById("myRankSeparator");
+
+    if (rank > 10) {
+      separator.style.display = "block";
+    } else {
+      separator.style.display = "none";
+    }
+
+  }
+});
+
+if (currentQuiz === "daily") {
+  const today = new Date().toISOString().slice(0, 10);
+
+  await db.collection("dailyChallenges")
+    .doc(today)
+    .collection("players")
+    .doc(playerId)
+    .set({
+      displayName: user,
+      score: score,
+      finishedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
 }
 
-   if (d.id === playerId) {
-
-  const myRankText =
-    `⭐ ${rank}. ${d.data().displayName || d.id} – ${d.data().points} poäng`;
-
-  document.getElementById("myRank").innerText = myRankText;
-
-  const separator = document.getElementById("myRankSeparator");
-
-  if (rank > 10) {
-    separator.style.display = "block";
-  } else {
-    separator.style.display = "none";
-  }
-
-}
-  });
 }
 
 function backToMenu() {
