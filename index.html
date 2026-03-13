@@ -778,6 +778,8 @@ body::after {
   <p id="profileBestCategory"></p>
 </div>
 
+  <button id="dailyBtn" onclick="startDailyChallenge()">🔥 Daily Challenge</button>
+
   <button class="menu-btn premier-league" onclick="startQuiz('pl')">
     <span>Premier League
   </button>
@@ -1996,6 +1998,51 @@ function startQuiz(type){
     .sort(() => Math.random() - 0.5)
     .slice(0, 20);
 
+  current = 0;
+  score = 0;
+
+  document.getElementById("menu").style.display = "none";
+  document.getElementById("quiz").style.display = "block";
+
+  showQuestion();
+}
+
+function startDailyChallenge() {
+  const today = new Date().toISOString().slice(0, 10);
+  const lastPlayed = localStorage.getItem("dailyChallengeDate");
+
+  if (lastPlayed === today) {
+    alert("Du har redan spelat dagens Daily Challenge. Kom tillbaka imorgon!");
+    return;
+  }
+
+  currentQuiz = "daily";
+
+  const categories = ["pl", "vm", "as", "sa", "ll", "bl", "l1", "cl", "em"];
+  let dailyQuestions = [];
+
+  // Ta 2 slumpfrågor från varje kategori
+  categories.forEach(cat => {
+    const selected = [...quizzes[cat]]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 2);
+
+    dailyQuestions.push(...selected);
+  });
+
+  // Fyll på med 2 extra slumpfrågor från alla kategorier
+  const allQuestions = categories.flatMap(cat => quizzes[cat]);
+
+  const extraQuestions = [...allQuestions]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 2);
+
+  dailyQuestions.push(...extraQuestions);
+
+  // Blanda slutlistan så kategorierna inte kommer i block
+  quiz = [...dailyQuestions]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 20);
 
   current = 0;
   score = 0;
@@ -2119,6 +2166,11 @@ function saveStats(score, total) {
 async function finish() {
   if (resultShown) return;
   resultShown = true;
+
+  if (currentQuiz === "daily") {
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem("dailyChallengeDate", today);
+  }
 
   // ✅ stoppa ev gamla timeouts (säkerhet)
   clearTimeout(finishTimeout);
