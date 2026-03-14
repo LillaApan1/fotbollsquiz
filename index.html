@@ -2215,6 +2215,13 @@ async function finish() {
 
   const quizBox = document.getElementById("quiz");
   const resultScreen = document.getElementById("result");
+  const dailyLeaderboard = document.getElementById("dailyLeaderboard");
+  const dailyTopList = document.getElementById("dailyTopList");
+  const dailyMyRank = document.getElementById("dailyMyRank");
+
+  dailyLeaderboard.style.display = "none";
+  dailyTopList.innerHTML = "";
+  dailyMyRank.innerText = "";
 
   /* ================= EXIT ANIMATION ================= */
   quizBox.classList.add("quiz-exit");
@@ -2377,6 +2384,53 @@ if (currentQuiz === "daily") {
       score: score,
       finishedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+}
+
+if (currentQuiz === "daily") {
+  const today = new Date().toISOString().slice(0, 10);
+
+  const dailyLeaderboard = document.getElementById("dailyLeaderboard");
+  const dailyTopList = document.getElementById("dailyTopList");
+  const dailyMyRank = document.getElementById("dailyMyRank");
+
+  dailyLeaderboard.style.display = "block";
+  dailyMyRank.innerText = "TEST: Daily-blocket visas";
+
+  const snapshot = await db.collection("dailyChallenges")
+    .doc(today)
+    .collection("players")
+    .orderBy("score", "desc")
+    .get();
+
+  let dailyRank = 0;
+
+  snapshot.forEach(doc => {
+    dailyRank++;
+
+    const data = doc.data();
+
+    if (dailyRank <= 10) {
+      const li = document.createElement("li");
+
+      let medal = "";
+      if (dailyRank === 1) medal = "🥇 ";
+      else if (dailyRank === 2) medal = "🥈 ";
+      else if (dailyRank === 3) medal = "🥉 ";
+
+      li.innerText = `${medal}${dailyRank}. ${data.displayName} – ${data.score} poäng`;
+
+      if (doc.id === playerId) {
+        li.classList.add("me");
+      }
+
+      dailyTopList.appendChild(li);
+    }
+
+    if (doc.id === playerId) {
+      dailyMyRank.innerText =
+        `⭐ Din placering idag: #${dailyRank} (${data.score} poäng)`;
+    }
+  });
 }
 
 }
