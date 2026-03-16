@@ -2201,10 +2201,12 @@ async function finish() {
   if (resultShown) return;
   resultShown = true;
 
-  if (currentQuiz === "daily") {
-    const today = new Date().toISOString().slice(0, 10);
-    localStorage.setItem("dailyChallengeDate", today);
-  }
+if (currentQuiz === "daily") {
+  const today = new Date().toISOString().slice(0, 10);
+  localStorage.setItem("dailyChallengeDate", today);
+
+  document.getElementById("dailyLeaderboard").style.display = "block";
+}
 
   // ✅ stoppa ev gamla timeouts (säkerhet)
   clearTimeout(finishTimeout);
@@ -2219,9 +2221,13 @@ async function finish() {
   const dailyTopList = document.getElementById("dailyTopList");
   const dailyMyRank = document.getElementById("dailyMyRank");
 
+  if (currentQuiz !== "daily") {
   dailyLeaderboard.style.display = "none";
   dailyTopList.innerHTML = "";
   dailyMyRank.innerText = "";
+} else {
+  dailyTopList.innerHTML = "";
+}
 
   /* ================= EXIT ANIMATION ================= */
   quizBox.classList.add("quiz-exit");
@@ -2325,16 +2331,16 @@ if (snap.exists) {
     gamesPlayed: gamesPlayed
 });
 
-  const list = await db.collection("players").orderBy("points", "desc").get();
+ const list = await db.collection("players").orderBy("points", "desc").get();
 
-  let rank = 0;
-  const top3 = document.getElementById("top3");
-  top3.innerHTML = "";
-  
-  document.getElementById("myRankSeparator").style.display = "none";
-  document.getElementById("myRank").innerText = "";
-  
-  list.forEach(d => {
+let rank = 0;
+const top3 = document.getElementById("top3");
+top3.innerHTML = "";
+
+document.getElementById("myRankSeparator").style.display = "none";
+document.getElementById("myRank").innerText = "";
+
+list.forEach(d => {
   rank++;
 
   if (rank <= 10) {
@@ -2355,7 +2361,6 @@ if (snap.exists) {
   }
 
   if (d.id === playerId) {
-
     const myRankText =
       `⭐ ${rank}. ${d.data().displayName || d.id} – ${d.data().points} poäng`;
 
@@ -2368,9 +2373,10 @@ if (snap.exists) {
     } else {
       separator.style.display = "none";
     }
-
   }
 });
+
+/* ================= DAILY SAVE ================= */
 
 if (currentQuiz === "daily") {
   const today = new Date().toISOString().slice(0, 10);
@@ -2386,6 +2392,8 @@ if (currentQuiz === "daily") {
     });
 }
 
+/* ================= DAILY LEADERBOARD ================= */
+
 if (currentQuiz === "daily") {
   const today = new Date().toISOString().slice(0, 10);
 
@@ -2394,7 +2402,8 @@ if (currentQuiz === "daily") {
   const dailyMyRank = document.getElementById("dailyMyRank");
 
   dailyLeaderboard.style.display = "block";
-  dailyMyRank.innerText = "TEST: Daily-blocket visas";
+  dailyTopList.innerHTML = "";
+  dailyMyRank.innerText = "";
 
   const snapshot = await db.collection("dailyChallenges")
     .doc(today)
@@ -2433,7 +2442,7 @@ if (currentQuiz === "daily") {
   });
 }
 
-}
+} 
 
 function backToMenu() {
   // ✅ stoppa timer + alla "hängande" timeouts från finish
