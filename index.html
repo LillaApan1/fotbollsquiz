@@ -731,6 +731,21 @@ button.daily-btn:hover {
   box-shadow: 0 10px 25px rgba(255,215,0,0.4);
 }
 
+/* ================= DAILY LEADERBOARD FIX ================= */
+
+#dailyTopList {
+  list-style: decimal;
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+#dailyTopList li {
+  margin: 6px 0;
+  font-size: 16px;
+  color: #fff; /* ändra till #000 om din bakgrund är ljus */
+  display: list-item;
+}
+
 </style>
 </head>
 
@@ -866,9 +881,12 @@ button.daily-btn:hover {
 </div>
 
 <p id="myRank"></p>
+
 <div id="dailyLeaderboard" style="display:none;">
   <h3>🔥 Daily Leaderboard</h3>
-  <ol id="dailyTopList"></ol>
+  <ol id="dailyTopList">
+    <li>HTML TESTRAD</li>
+  </ol>
   <p id="dailyMyRank"></p>
 </div>
 
@@ -2395,51 +2413,56 @@ if (currentQuiz === "daily") {
 /* ================= DAILY LEADERBOARD ================= */
 
 if (currentQuiz === "daily") {
-  const today = new Date().toISOString().slice(0, 10);
 
-  const dailyLeaderboard = document.getElementById("dailyLeaderboard");
-  const dailyTopList = document.getElementById("dailyTopList");
-  const dailyMyRank = document.getElementById("dailyMyRank");
+  setTimeout(async () => {
 
-  dailyLeaderboard.style.display = "block";
-  dailyTopList.innerHTML = "";
-  dailyMyRank.innerText = "";
+    const today = new Date().toISOString().slice(0, 10);
 
-  const snapshot = await db.collection("dailyChallenges")
-    .doc(today)
-    .collection("players")
-    .orderBy("score", "desc")
-    .get();
+    const dailyLeaderboard = document.getElementById("dailyLeaderboard");
+    const dailyTopList = document.getElementById("dailyTopList");
+    const dailyMyRank = document.getElementById("dailyMyRank");
 
-  let dailyRank = 0;
+    dailyLeaderboard.style.display = "block";
+    dailyTopList.innerHTML = "";
+    dailyMyRank.innerText = "";
 
-  snapshot.forEach(doc => {
-    dailyRank++;
+    const snapshot = await db.collection("dailyChallenges")
+      .doc(today)
+      .collection("players")
+      .orderBy("score", "desc")
+      .get();
 
-    const data = doc.data();
+    let dailyRank = 0;
 
-    if (dailyRank <= 10) {
-      const li = document.createElement("li");
+    snapshot.forEach(doc => {
+      dailyRank++;
 
-      let medal = "";
-      if (dailyRank === 1) medal = "🥇 ";
-      else if (dailyRank === 2) medal = "🥈 ";
-      else if (dailyRank === 3) medal = "🥉 ";
+      const data = doc.data();
 
-      li.innerText = `${medal}${dailyRank}. ${data.displayName} – ${data.score} poäng`;
+      if (dailyRank <= 10) {
+        const li = document.createElement("li");
 
-      if (doc.id === playerId) {
-        li.classList.add("me");
+        let medal = "";
+        if (dailyRank === 1) medal = "🥇 ";
+        else if (dailyRank === 2) medal = "🥈 ";
+        else if (dailyRank === 3) medal = "🥉 ";
+
+        li.innerText = `${medal}${dailyRank}. ${data.displayName} – ${data.score} poäng`;
+
+        if (doc.id === playerId) {
+          li.classList.add("me");
+        }
+
+        dailyTopList.appendChild(li);
       }
 
-      dailyTopList.appendChild(li);
-    }
+      if (doc.id === playerId) {
+        dailyMyRank.innerText =
+          `⭐ Din placering idag: #${dailyRank} (${data.score} poäng)`;
+      }
+    });
 
-    if (doc.id === playerId) {
-      dailyMyRank.innerText =
-        `⭐ Din placering idag: #${dailyRank} (${data.score} poäng)`;
-    }
-  });
+  }, 300); // ← viktig!
 }
 
 } 
