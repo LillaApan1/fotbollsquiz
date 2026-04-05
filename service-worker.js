@@ -1,5 +1,5 @@
 // 🔥 Automatisk versionshantering – höj version vid varje deploy
-const CACHE_NAME = "quiz-cache-v39";
+const CACHE_NAME = "quiz-cache-v40";
 
 // Filer som ska finnas offline för själva quizet
 const APP_SHELL = [
@@ -8,8 +8,8 @@ const APP_SHELL = [
   "./styles.css",
   "./quizzes.js",
   "./manifest.json",
-  "./icon-192-v4.png",
-  "./icon-512-v4.png"
+  "./icon-192-v5.png",
+  "./icon-512-v5.png"
 ];
 
 // 📩 Ta emot meddelande från appen om att hoppa över vänteläge

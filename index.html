@@ -521,6 +521,18 @@ title.innerText = currentQuiz === "daily"
       rank++;
       const data = doc.data();
       const li = document.createElement("li");
+      
+      li.onclick = () => {
+  // ta bort highlight från alla
+  document.querySelectorAll("#dailyTopList li, #overallTopList li")
+    .forEach(el => el.classList.remove("selected-player"));
+
+  // lägg till på denna
+  li.classList.add("selected-player");
+
+  // ladda stats för spelaren
+  loadProfileStats(data.name);
+};
 
       if (rank === 1) li.classList.add("top1");
       if (rank === 2) li.classList.add("top2");
@@ -538,12 +550,8 @@ title.innerText = currentQuiz === "daily"
         li.classList.add("me");
         myRank.innerText = `Din placering: #${rank}`;
       }
-
-      li.querySelector(".clickable-name").addEventListener("click", () => {
-        loadProfileStats(data.name);
-      });
-
-      list.appendChild(li);
+      
+    list.appendChild(li);
     });
 
     document.getElementById("dailyLeaderboard").style.display = "block";
@@ -592,6 +600,16 @@ async function loadOverallLeaderboard() {
       rank++;
       const data = doc.data();
       const li = document.createElement("li");
+      
+      li.onclick = () => {
+  document.querySelectorAll("#dailyTopList li, #overallTopList li")
+    .forEach(el => el.classList.remove("selected-player"));
+
+  li.classList.add("selected-player");
+
+  loadProfileStats(data.displayName || doc.id);
+};
+
       const playerName = data.displayName || doc.id;
 
       if (rank === 1) li.classList.add("top1");
@@ -610,10 +628,6 @@ async function loadOverallLeaderboard() {
         li.classList.add("me");
         myRank.innerText = `Din placering: #${rank}`;
       }
-
-      li.querySelector(".clickable-name").addEventListener("click", () => {
-        loadProfileStats(playerName);
-      });
 
       list.appendChild(li);
     });
