@@ -1,5 +1,16 @@
-// 🔥 Automatisk versionshantering – ny version vid varje deploy
-const CACHE_NAME = "quiz-cache-v38";
+// 🔥 Automatisk versionshantering – höj version vid varje deploy
+const CACHE_NAME = "quiz-cache-v39";
+
+// Filer som ska finnas offline för själva quizet
+const APP_SHELL = [
+  "./",
+  "./index.html",
+  "./styles.css",
+  "./quizzes.js",
+  "./manifest.json",
+  "./icon-192-v4.png",
+  "./icon-512-v4.png"
+];
 
 // 📩 Ta emot meddelande från appen om att hoppa över vänteläge
 self.addEventListener("message", event => {
@@ -13,13 +24,7 @@ self.addEventListener("install", event => {
   self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache =>
-      cache.addAll([
-        "./",
-        "./index.html",
-        "./manifest.json"
-      ])
-    )
+    caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL))
   );
 });
 
@@ -39,26 +44,49 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-  if (event.request.mode === "navigate") {
-    // HTML-förfrågningar (index.html)
+  const req = event.request;
+  const url = new URL(req.url);
+
+  // Hoppa över annat än GET
+  if (req.method !== "GET") return;
+
+  // Låt Firestore/Firebase/API-anrop gå direkt mot nätet
+  if (
+    url.origin.includes("googleapis.com") ||
+    url.origin.includes("gstatic.com") ||
+    url.origin.includes("firebaseapp.com")
+  ) {
+    return;
+  }
+
+  // HTML/navigation: network first, fallback till cache
+  if (req.mode === "navigate") {
     event.respondWith(
-      fetch(event.request)
+      fetch(req)
         .then(response => {
           const copy = response.clone();
           caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, copy);
+            cache.put("./index.html", copy);
           });
           return response;
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => caches.match("./index.html"))
     );
-  } else {
-    // Övriga filer (css, js, bilder)
-    event.respondWith(
-      caches.match(event.request).then(response => {
-        return response || fetch(event.request);
-      })
-    );
+    return;
   }
-});
 
+  // App shell-filer: cache first, fallback till nät
+  event.respondWith(
+    caches.match(req).then(cached => {
+      if (cached) return cached;
+
+      return fetch(req).then(response => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(req, copy);
+        });
+        return response;
+      });
+    })
+  );
+});
