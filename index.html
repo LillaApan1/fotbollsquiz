@@ -8,7 +8,7 @@
 <title>YouKnowBall</title>
 
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192-v4.png">
+<link rel="apple-touch-icon" href="icon-192-v6.png">
 <meta name="theme-color" content="#0f2027">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -23,7 +23,7 @@
 <div id="introScreen">
   <div id="introContent">
     <div id="introLogoWrap">
-      <img src="icon-512-v4.png" id="introLogo">
+      <img src="intro-logo.png" id="introLogo">
     </div>
     <h1 id="introTitle">YouKnowBall</h1>
   </div>
@@ -88,7 +88,8 @@
   <div id="resultTitle">Ditt resultat</div>
   <h2 id="scoreText"></h2>
   <div id="scorePercent"></div>
-
+  <div id="levelUpMessage"></div>
+  <div id="xpGain"></div>
   <div id="dailyLeaderboard" style="display:none;">
     <h3 id="leaderboardTitle">🏆 Leaderboard</h3>
     <ol id="dailyTopList"></ol>
@@ -96,7 +97,7 @@
   </div>
 
   <div id="overallLeaderboard">
-  <h3>🌍 Global ranking</h3>
+  <h3>🏆 Overall Ranking</h3>
   <ol id="overallTopList"></ol>
   <p id="overallMyRank"></p>
 </div>  
@@ -104,7 +105,18 @@
 <div id="profilePanel">
   <h3 class="profile-title" id="profileTitle">📊 Din statistik</h3>
 
-  <div class="profile-grid">
+<div class="level-box">
+  <div class="level-top">
+    <span>Level <span id="profileLevel">0</span></span>
+    <span id="profileXP">0 XP</span>
+  </div>
+
+  <div class="level-bar">
+    <div id="profileProgress"></div>
+  </div>
+</div>
+  
+<div class="profile-grid">
     <div class="profile-card">
       <div class="profile-value" id="profilePoints"></div>
       <div class="profile-label">Totalpoäng</div>
@@ -405,10 +417,28 @@ setTimeout(() => {
   iconEl.innerText = "🎯";
 }
 
+const levelUpMessage = document.getElementById("levelUpMessage");
+levelUpMessage.classList.remove("show");
+levelUpMessage.innerText = "";
+
+const oldPlayerDoc = await db.collection("players").doc(username).get();
+const oldXP = oldPlayerDoc.exists ? (oldPlayerDoc.data().xp || 0) : 0;
+const oldLevel = getLevelData(oldXP).level;
+
   await saveScore();
   await loadLeaderboard();
   await loadOverallLeaderboard();
   await loadProfileStats();
+
+const newPlayerDoc = await db.collection("players").doc(username).get();
+const newXP = newPlayerDoc.exists ? (newPlayerDoc.data().xp || 0) : 0;
+const newLevel = getLevelData(newXP).level;
+
+if (newLevel > oldLevel) {
+  levelUpMessage.innerText = `🎉 Level up! Du nådde level ${newLevel}`;
+  void levelUpMessage.offsetWidth;
+  levelUpMessage.classList.add("show");
+}
 
   if (currentQuiz === "daily") {
     const today = new Date().toISOString().slice(0, 10);
@@ -434,12 +464,35 @@ setTimeout(() => {
   }
 }
 
+function calculateXP(score, totalQuestions, currentQuiz) {
+  const percent = Math.round((score / totalQuestions) * 100);
+  const streak = parseInt(localStorage.getItem("dailyStreak") || "0");
+  const streakBonus = Math.min(streak, 7);
+
+  let xp = score;
+
+  if (percent >= 90) {
+    xp += 10;
+  } else if (percent >= 75) {
+    xp += 5;
+  }
+
+  if (currentQuiz === "daily") {
+    xp += 5;
+    xp += streakBonus;
+  }
+
+  return xp;
+}
+
+
 // ================= FIRESTORE =================
 async function saveScore() {
   try {
     const today = new Date().toISOString().slice(0, 10);
-
-    await db.collection("scores").add({
+    const earnedXP = calculateXP(score, currentQuestions.length, currentQuiz);
+    
+await db.collection("scores").add({
       name: username,
       score: score,
       quiz: currentQuiz,
@@ -461,16 +514,16 @@ if (playerDoc.exists) {
     bestScore: Math.max(
       typeof currentData.bestScore === "number" ? currentData.bestScore : 0,
       score
-    )
+    ),
+    xp: (currentData.xp || 0) + earnedXP
   });
-} 
-
-else {
+} else {
   await playerRef.set({
     displayName: username,
     points: score,
     gamesPlayed: 1,
-    bestScore: score
+    bestScore: score,
+    xp: earnedXP
   });
 }
 
@@ -539,10 +592,10 @@ title.innerText = currentQuiz === "daily"
       if (rank === 3) li.classList.add("top3");
 
       const medalIcon = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`;
-
+      const titleData = getTitleData(getLevelData(data.xp || 0).level);	
       li.innerHTML = `
         <span class="rank-number">${medalIcon}</span>
-        <span class="rank-name clickable-name" data-player="${data.name}">${data.name}</span>
+        <span class="rank-name clickable-name" data-player="${data.name}">${titleData.icon} ${data.name}</span>
         <span class="rank-points">${data.score} poäng</span>
       `;
 
@@ -617,11 +670,11 @@ async function loadOverallLeaderboard() {
       if (rank === 3) li.classList.add("top3");
 
       const medalIcon = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`;
-
+      const titleData = getTitleData(getLevelData(data.xp || 0).level);
       li.innerHTML = `
         <span class="rank-number">${medalIcon}</span>
-        <span class="rank-name clickable-name" data-player="${playerName}">${playerName}</span>
-        <span class="rank-points">${data.points} poäng</span>
+        <span class="rank-name clickable-name" data-player="${playerName}">${titleData.icon} ${playerName}</span>
+        <span class="rank-points">${(data.points || 0).toLocaleString("sv-SE")} poäng</span>
       `;
 
       if (playerName === username) {
@@ -654,11 +707,47 @@ async function loadOverallLeaderboard() {
   }
 }
 
+function getLevelData(xp) {
+  let level = 0;
+  let xpForCurrentLevel = 0;
+  let xpForNextLevel = 50;
+
+  while (xp >= xpForNextLevel) {
+    level++;
+    xpForCurrentLevel = xpForNextLevel;
+    xpForNextLevel += 50 + (level * level * 10);
+  }
+
+  const progress = xp - xpForCurrentLevel;
+  const needed = xpForNextLevel - xpForCurrentLevel;
+  const percent = Math.max(0, Math.min(100, Math.floor((progress / needed) * 100)));
+
+  return {
+    level,
+    progress,
+    needed,
+    percent,
+    currentLevelXP: xpForCurrentLevel,
+    nextLevelXP: xpForNextLevel
+  };
+}
+
+function getTitleData(level) {
+  if (level >= 30) return { title: "GOAT", icon: "👑" };
+  if (level >= 25) return { title: "Icon", icon: "🟡" };
+  if (level >= 20) return { title: "Legend", icon: "🔴" };
+  if (level >= 15) return { title: "Master", icon: "🟠" };
+  if (level >= 10) return { title: "Elite", icon: "🟣" };
+  if (level >= 6) return { title: "Contender", icon: "🔵" };
+  if (level >= 3) return { title: "Challenger", icon: "🟢" };
+  return { title: "Rookie", icon: "⚪" };
+}
+
 async function loadProfileStats(playerName = username) {
   try {
-    document.getElementById("profileTitle").innerText = playerName === username ? "📊 Din statistik" : `📊 Statistik: ${playerName}`;
-    
     const profilePanel = document.getElementById("profilePanel");
+    const profileTitle = document.getElementById("profileTitle");
+
     profilePanel.classList.remove("profile-panel-me");
 
     if (playerName === username) {
@@ -668,7 +757,7 @@ async function loadProfileStats(playerName = username) {
     profilePanel.classList.remove("profile-switch");
     void profilePanel.offsetWidth;
     profilePanel.classList.add("profile-switch");
-    
+
     let playerDoc = await db.collection("players").doc(playerName).get();
     let data = null;
 
@@ -686,10 +775,14 @@ async function loadProfileStats(playerName = username) {
     }
 
     if (!data) {
+      profileTitle.innerText = playerName === username ? "📊 Din statistik" : `📊 Statistik: ${playerName}`;
       document.getElementById("profilePoints").innerText = "-";
       document.getElementById("profileGames").innerText = "-";
       document.getElementById("profileBestScore").innerText = "-";
       document.getElementById("profileAverage").innerText = "-";
+      document.getElementById("profileLevel").innerText = "0";
+      document.getElementById("profileXP").innerText = "0 XP";
+      document.getElementById("profileProgress").style.width = "0%";
       return;
     }
 
@@ -697,11 +790,24 @@ async function loadProfileStats(playerName = username) {
     const gamesPlayed = data.gamesPlayed || 0;
     const bestScore = data.bestScore || 0;
     const avg = gamesPlayed > 0 ? (totalPoints / gamesPlayed).toFixed(1) : "0.0";
+    const xp = data.xp || 0;
 
-    document.getElementById("profilePoints").innerText = totalPoints;
+    const levelData = getLevelData(xp);
+    const titleData = getTitleData(levelData.level);
+
+    profileTitle.innerText =
+      playerName === username
+        ? `📊 Din statistik • ${titleData.icon} ${titleData.title}`
+        : `📊 Statistik: ${titleData.icon} ${playerName} • ${titleData.title}`;
+
+    document.getElementById("profilePoints").innerText = totalPoints.toLocaleString("sv-SE");
     document.getElementById("profileGames").innerText = gamesPlayed;
     document.getElementById("profileBestScore").innerText = bestScore;
     document.getElementById("profileAverage").innerText = avg;
+
+    document.getElementById("profileLevel").innerText = levelData.level;
+    document.getElementById("profileXP").innerText = `${xp.toLocaleString("sv-SE")} XP`;
+    document.getElementById("profileProgress").style.width = levelData.percent + "%";
   } catch (e) {
     console.error("Profile stats error", e);
   }
