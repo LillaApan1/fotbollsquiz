@@ -1,5 +1,5 @@
 // 🔥 Automatisk versionshantering – höj version vid varje deploy
-const CACHE_NAME = "quiz-cache-v42";
+const CACHE_NAME = "quiz-cache-v43";
 
 // Filer som ska finnas offline för själva quizet
 const APP_SHELL = [
