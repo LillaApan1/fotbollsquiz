@@ -3,7 +3,7 @@
   "short_name": "YouKnowBall",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0f2027",
+  "background_color": "#16a34a",
   "theme_color": "#22c55e",
   "orientation": "portrait",
   "icons": [
