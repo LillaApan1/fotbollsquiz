@@ -1436,3 +1436,113 @@ button.daily-btn:hover {
   }
 }
 
+/* ================= ACHIEVEMENTS PANEL ================= */
+
+#achievementsPanel {
+  margin-top: 22px;
+  padding: 18px 18px 16px 18px;
+
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+
+  box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+  backdrop-filter: blur(6px);
+}
+
+#achievementsPanel h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-shadow: 0 0 10px rgba(255,255,255,0.06);
+}
+
+#achievementsList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.achievement-card {
+  position: relative;
+  overflow: hidden;
+
+  padding: 14px 12px;
+  border-radius: 14px;
+
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+
+  text-align: center;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.achievement-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.24);
+  border-color: rgba(255,255,255,0.14);
+}
+
+.achievement-card.unlocked {
+  background: linear-gradient(135deg, rgba(255,215,0,0.14), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,215,0,0.32);
+  box-shadow: 0 0 18px rgba(255,215,0,0.12);
+}
+
+.achievement-card.locked {
+  opacity: 0.68;
+}
+
+.achievement-icon {
+  display: block;
+  font-size: 30px;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.achievement-name {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.achievement-desc {
+  font-size: 12px;
+  line-height: 1.35;
+  opacity: 0.78;
+}
+
+.achievement-card.unlocked::after {
+  content: "Unlocked";
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: rgba(255,215,0,0.9);
+}
+
+@media (max-width: 600px) {
+  #achievementsPanel {
+    margin-top: 18px;
+    padding: 16px 14px 14px 14px;
+  }
+
+  #achievementsList {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .achievement-card {
+    padding: 13px 12px;
+  }
+
+  .achievement-icon {
+    font-size: 28px;
+  }
+}

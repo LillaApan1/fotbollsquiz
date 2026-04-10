@@ -139,6 +139,11 @@
   </div>
 </div>
 
+<div id="achievementsPanel">
+  <h3>🏆 Achievements</h3>
+  <div id="achievementsList"></div>
+</div>
+
   <button id="backBtn">Spela igen</button>
 </div>
 
@@ -486,6 +491,7 @@ function calculateXP(score, totalQuestions, currentQuiz) {
 }
 
 
+
 // ================= FIRESTORE =================
 async function saveScore() {
   try {
@@ -507,23 +513,52 @@ const playerDoc = await playerRef.get();
 if (playerDoc.exists) {
   const currentData = playerDoc.data();
 
+  const newPoints = (currentData.points || 0) + score;
+  const newGamesPlayed = (currentData.gamesPlayed || 0) + 1;
+  const oldBestScore = typeof currentData.bestScore === "number" ? currentData.bestScore : 0;
+  const newBestScore = Math.max(oldBestScore, score);
+  const newXP = (currentData.xp || 0) + earnedXP;
+
+  const unlockedNow = getUnlockedAchievements({
+    points: newPoints,
+    gamesPlayed: newGamesPlayed,
+    bestScore: newBestScore,
+    xp: newXP
+  });
+
+  const existingAchievements = currentData.achievements || {};
+
+  const mergedAchievements = {
+    ...existingAchievements,
+    ...Object.fromEntries(
+      Object.entries(unlockedNow).filter(([_, value]) => value === true)
+    )
+  };
+
   await playerRef.update({
     displayName: username,
-    points: (currentData.points || 0) + score,
-    gamesPlayed: (currentData.gamesPlayed || 0) + 1,
-    bestScore: Math.max(
-      typeof currentData.bestScore === "number" ? currentData.bestScore : 0,
-      score
-    ),
-    xp: (currentData.xp || 0) + earnedXP
+    points: newPoints,
+    gamesPlayed: newGamesPlayed,
+    bestScore: newBestScore,
+    xp: newXP,
+    achievements: mergedAchievements
   });
+
 } else {
+  const unlockedNow = getUnlockedAchievements({
+    points: score,
+    gamesPlayed: 1,
+    bestScore: score,
+    xp: earnedXP
+  });
+
   await playerRef.set({
     displayName: username,
     points: score,
     gamesPlayed: 1,
     bestScore: score,
-    xp: earnedXP
+    xp: earnedXP,
+    achievements: unlockedNow
   });
 }
 
@@ -743,6 +778,86 @@ function getTitleData(level) {
   return { title: "Rookie", icon: "⚪" };
 }
 
+const ACHIEVEMENTS = [
+  {
+    id: "first_quiz",
+    icon: "🎮",
+    name: "Första rundan",
+    desc: "Spela klart ditt första quiz"
+  },
+  {
+    id: "perfect_score",
+    icon: "💯",
+    name: "Perfekt runda",
+    desc: "Få full pott i ett quiz"
+  },
+  {
+    id: "daily_streak_3",
+    icon: "🔥",
+    name: "On Fire",
+    desc: "Nå 3 dagars Daily streak"
+  },
+  {
+    id: "quiz_25",
+    icon: "🧠",
+    name: "Veteran",
+    desc: "Spela 25 quiz"
+  },
+  {
+    id: "points_100",
+    icon: "🏆",
+    name: "Centurion",
+    desc: "Nå 100 totalpoäng"
+  },
+  {
+    id: "level_10",
+    icon: "👑",
+    name: "Elite Mind",
+    desc: "Nå level 10"
+  }
+];
+
+function getUnlockedAchievements(playerData) {
+  const points = playerData.points || 0;
+  const gamesPlayed = playerData.gamesPlayed || 0;
+  const bestScore = playerData.bestScore || 0;
+  const xp = playerData.xp || 0;
+  const streak = parseInt(localStorage.getItem("dailyStreak") || "0");
+
+  const levelData = getLevelData(xp);
+
+  return {
+    first_quiz: gamesPlayed >= 1,
+    perfect_score: bestScore >= 20,
+    daily_streak_3: streak >= 3,
+    quiz_25: gamesPlayed >= 25,
+    points_100: points >= 100,
+    level_10: levelData.level >= 10
+  };
+}
+
+function renderAchievements(playerData) {
+  const achievementsList = document.getElementById("achievementsList");
+  const unlocked = playerData.achievements || getUnlockedAchievements(playerData);
+  
+  achievementsList.innerHTML = "";
+
+  ACHIEVEMENTS.forEach(achievement => {
+    const isUnlocked = unlocked[achievement.id];
+
+    const card = document.createElement("div");
+    card.className = `achievement-card ${isUnlocked ? "unlocked" : "locked"}`;
+
+    card.innerHTML = `
+      <span class="achievement-icon">${achievement.icon}</span>
+      <div class="achievement-name">${achievement.name}</div>
+      <div class="achievement-desc">${achievement.desc}</div>
+    `;
+
+    achievementsList.appendChild(card);
+  });
+}
+
 async function loadProfileStats(playerName = username) {
   try {
     const profilePanel = document.getElementById("profilePanel");
@@ -808,6 +923,8 @@ async function loadProfileStats(playerName = username) {
     document.getElementById("profileLevel").innerText = levelData.level;
     document.getElementById("profileXP").innerText = `${xp.toLocaleString("sv-SE")} XP`;
     document.getElementById("profileProgress").style.width = levelData.percent + "%";
+    renderAchievements(data);
+
   } catch (e) {
     console.error("Profile stats error", e);
   }
